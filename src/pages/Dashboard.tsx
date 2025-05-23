@@ -1,4 +1,3 @@
-
 import React from 'react';
 import Navigation from '@/components/Navigation';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -9,7 +8,7 @@ const Dashboard = () => {
   const dashboardStats = [
     {
       title: 'Total Revenue',
-      value: '$12,450',
+      value: 'KSh 42,450',
       change: '+12.5%',
       icon: DollarSign,
       color: 'text-green-600',
@@ -40,19 +39,19 @@ const Dashboard = () => {
   const recentActivity = [
     {
       type: 'Sale',
-      description: 'Sold 50kg tomatoes to Green Valley Grocers',
-      amount: '$125.00',
+      description: 'Sold 50kg maize to Nairobi Fresh Grocers',
+      amount: 'KSh 2,250',
       time: '2 hours ago',
     },
     {
       type: 'Alert',
-      description: 'Potato prices increased by 8.5%',
-      amount: '$2.15/kg',
+      description: 'Potato prices increased by 8.5% in Nakuru',
+      amount: 'KSh 38/kg',
       time: '4 hours ago',
     },
     {
       type: 'Contact',
-      description: 'New inquiry from Farm Fresh Restaurant',
+      description: 'New inquiry from Tuskys Supermarket',
       amount: 'Organic vegetables',
       time: '1 day ago',
     },
@@ -68,7 +67,7 @@ const Dashboard = () => {
             <div>
               <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
               <p className="mt-2 text-lg text-gray-600">
-                Welcome back, John! Here's your farming business overview.
+                Welcome back, Wanjiku! Here's your farming business overview.
               </p>
             </div>
             <Button className="bg-green-600 hover:bg-green-700">
@@ -160,7 +159,7 @@ const Dashboard = () => {
             <div className="bg-gray-100 rounded-lg p-8 text-center">
               <p className="text-gray-600">No active listings</p>
               <p className="text-sm text-gray-500 mt-2">
-                Create your first listing to start connecting with buyers
+                Create your first listing to start connecting with Kenyan buyers
               </p>
               <Button className="mt-4 bg-green-600 hover:bg-green-700">
                 <Plus className="h-4 w-4 mr-2" />

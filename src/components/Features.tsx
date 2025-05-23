@@ -6,22 +6,22 @@ const Features = () => {
   const features = [
     {
       name: 'Real-time Market Prices',
-      description: 'Get up-to-date pricing information for all your crops across different markets.',
+      description: 'Get up-to-date pricing information for maize, beans, potatoes and other crops across Kenyan markets.',
       icon: TrendingUp,
     },
     {
-      name: 'Find Nearby Markets',
-      description: 'Locate the closest markets and buyers in your area with our smart mapping system.',
+      name: 'Find Local Markets',
+      description: 'Locate the closest markets and buyers in your county with our smart mapping system.',
       icon: MapPin,
     },
     {
-      name: 'Connect with Buyers',
-      description: 'Build relationships with verified buyers who are actively seeking your produce.',
+      name: 'Connect with Kenyan Buyers',
+      description: 'Build relationships with verified buyers from Nairobi, Mombasa, Nakuru, and other major cities.',
       icon: Users,
     },
     {
-      name: 'Price Alerts',
-      description: 'Receive notifications when market prices reach your target selling points.',
+      name: 'M-Pesa Price Alerts',
+      description: 'Receive SMS notifications via M-Pesa when market prices reach your target selling points.',
       icon: Bell,
     },
   ];
@@ -32,10 +32,10 @@ const Features = () => {
         <div className="lg:text-center">
           <h2 className="text-base text-green-600 font-semibold tracking-wide uppercase">Features</h2>
           <p className="mt-2 text-3xl leading-8 font-extrabold tracking-tight text-gray-900 sm:text-4xl">
-            Everything farmers need to succeed
+            Everything Kenyan farmers need to succeed
           </p>
           <p className="mt-4 max-w-2xl text-xl text-gray-500 lg:mx-auto">
-            Our platform provides comprehensive tools to help farmers make informed decisions and maximize their profits.
+            Our platform provides comprehensive tools to help smallholder farmers make informed decisions and maximize their profits.
           </p>
         </div>
 

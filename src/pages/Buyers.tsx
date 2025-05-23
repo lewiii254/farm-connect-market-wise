@@ -1,4 +1,3 @@
-
 import React from 'react';
 import Navigation from '@/components/Navigation';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -8,39 +7,39 @@ import { MapPin, Phone, Star, Users } from 'lucide-react';
 const Buyers = () => {
   const buyers = [
     {
-      name: 'Green Valley Grocers',
+      name: 'Nairobi Fresh Grocers',
       type: 'Grocery Chain',
       location: '2.3 km away',
       rating: 4.8,
       products: ['Vegetables', 'Fruits', 'Herbs'],
-      phone: '+1 (555) 123-4567',
+      phone: '+254 712 345 678',
       image: 'https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=400&q=80'
     },
     {
-      name: 'Farm Fresh Restaurant',
-      type: 'Restaurant',
+      name: 'Tuskys Supermarket',
+      type: 'Retail Chain',
       location: '5.1 km away',
       rating: 4.9,
-      products: ['Organic Vegetables', 'Seasonal Fruits'],
-      phone: '+1 (555) 234-5678',
+      products: ['Organic Produce', 'Seasonal Fruits'],
+      phone: '+254 723 456 789',
       image: 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=400&q=80'
     },
     {
-      name: 'City Wholesale Market',
+      name: 'Mombasa Wholesale Hub',
       type: 'Wholesale',
       location: '8.7 km away',
       rating: 4.5,
-      products: ['Bulk Vegetables', 'Grains', 'Dairy'],
-      phone: '+1 (555) 345-6789',
+      products: ['Bulk Vegetables', 'Grains', 'Cereals'],
+      phone: '+254 734 567 890',
       image: 'https://images.unsplash.com/photo-1488459716781-31db52582fe9?auto=format&fit=crop&w=400&q=80'
     },
     {
-      name: 'Organic Food Co-op',
+      name: 'Kenya Organic Network',
       type: 'Cooperative',
       location: '12.4 km away',
       rating: 4.7,
-      products: ['Organic Produce', 'Specialty Crops'],
-      phone: '+1 (555) 456-7890',
+      products: ['Organic Produce', 'Indigenous Crops'],
+      phone: '+254 745 678 901',
       image: 'https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?auto=format&fit=crop&w=400&q=80'
     },
   ];
@@ -53,7 +52,7 @@ const Buyers = () => {
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900">Find Buyers</h1>
           <p className="mt-2 text-lg text-gray-600">
-            Connect with verified buyers and markets in your area
+            Connect with verified buyers and markets across Kenya
           </p>
         </div>
 
@@ -124,7 +123,7 @@ const Buyers = () => {
             <Card>
               <CardHeader>
                 <CardTitle>Map View</CardTitle>
-                <CardDescription>Buyers and markets near you</CardDescription>
+                <CardDescription>Buyers and markets near you in Kenya</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="bg-gray-100 rounded-lg h-64 flex items-center justify-center">
@@ -132,7 +131,7 @@ const Buyers = () => {
                     <MapPin className="h-12 w-12 text-green-600 mx-auto mb-2" />
                     <p className="text-gray-600">Interactive map coming soon!</p>
                     <p className="text-sm text-gray-500 mt-1">
-                      View buyers on an interactive map
+                      View buyers across Kenya on an interactive map
                     </p>
                   </div>
                 </div>
@@ -146,19 +145,19 @@ const Buyers = () => {
               <CardContent className="space-y-3">
                 <Button variant="outline" className="w-full justify-start">
                   <Users className="h-4 w-4 mr-2" />
-                  Restaurants
+                  Supermarkets
                 </Button>
                 <Button variant="outline" className="w-full justify-start">
                   <Users className="h-4 w-4 mr-2" />
-                  Grocery Stores
+                  Local Markets
                 </Button>
                 <Button variant="outline" className="w-full justify-start">
                   <Users className="h-4 w-4 mr-2" />
-                  Wholesale Markets
+                  Wholesale Buyers
                 </Button>
                 <Button variant="outline" className="w-full justify-start">
                   <Users className="h-4 w-4 mr-2" />
-                  Cooperatives
+                  Exporters
                 </Button>
               </CardContent>
             </Card>

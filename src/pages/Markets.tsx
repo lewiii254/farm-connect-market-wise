@@ -7,52 +7,52 @@ import { TrendingUp, TrendingDown, Minus } from 'lucide-react';
 const Markets = () => {
   const marketData = [
     {
-      crop: 'Tomatoes',
-      currentPrice: '$2.50/kg',
+      crop: 'Maize',
+      currentPrice: 'KSh 45/kg',
       change: '+5.2%',
       trend: 'up',
-      market: 'Central Market',
-      location: 'Downtown',
+      market: 'Wakulima Market',
+      location: 'Nairobi',
+    },
+    {
+      crop: 'Beans',
+      currentPrice: 'KSh 120/kg',
+      change: '-2.1%',
+      trend: 'down',
+      market: 'Kongowea Market',
+      location: 'Mombasa',
     },
     {
       crop: 'Potatoes',
-      currentPrice: '$1.80/kg',
-      change: '-2.1%',
-      trend: 'down',
-      market: 'Farmers Market',
-      location: 'North District',
-    },
-    {
-      crop: 'Onions',
-      currentPrice: '$1.20/kg',
+      currentPrice: 'KSh 38/kg',
       change: '0.0%',
       trend: 'stable',
-      market: 'Wholesale Market',
-      location: 'Industrial Zone',
+      market: 'Nakuru Wholesale',
+      location: 'Nakuru',
     },
     {
-      crop: 'Carrots',
-      currentPrice: '$2.00/kg',
+      crop: 'Tomatoes',
+      currentPrice: 'KSh 85/kg',
       change: '+8.5%',
       trend: 'up',
-      market: 'Organic Market',
-      location: 'Green Valley',
+      market: 'Karatina Market',
+      location: 'Nyeri',
     },
     {
-      crop: 'Lettuce',
-      currentPrice: '$3.20/kg',
+      crop: 'Kales (Sukuma Wiki)',
+      currentPrice: 'KSh 25/bunch',
       change: '+12.3%',
       trend: 'up',
-      market: 'Fresh Produce Hub',
-      location: 'City Center',
+      market: 'Eldoret Market',
+      location: 'Eldoret',
     },
     {
-      crop: 'Corn',
-      currentPrice: '$0.85/kg',
+      crop: 'Avocados',
+      currentPrice: 'KSh 35/piece',
       change: '-4.7%',
       trend: 'down',
-      market: 'Agricultural Exchange',
-      location: 'Farm District',
+      market: 'Kisumu Fresh Produce',
+      location: 'Kisumu',
     },
   ];
 
@@ -86,7 +86,7 @@ const Markets = () => {
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900">Market Prices</h1>
           <p className="mt-2 text-lg text-gray-600">
-            Real-time pricing information from markets in your area
+            Real-time pricing information from markets across Kenya
           </p>
         </div>
 
@@ -122,7 +122,7 @@ const Markets = () => {
           <div className="bg-gray-100 rounded-lg p-8 text-center">
             <p className="text-gray-600">Interactive price charts coming soon!</p>
             <p className="text-sm text-gray-500 mt-2">
-              Track historical pricing data and market trends
+              Track historical pricing data and market trends across Kenya
             </p>
           </div>
         </div>

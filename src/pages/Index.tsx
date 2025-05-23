@@ -17,10 +17,10 @@ const Index = () => {
       <div className="bg-white py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-3xl font-extrabold text-gray-900 sm:text-4xl">
-            Ready to boost your farming profits?
+            Ready to boost your farming profits in Kenya?
           </h2>
           <p className="mt-4 text-xl text-gray-600">
-            Join thousands of farmers who trust FarmConnect to maximize their revenue
+            Join hundreds of farmers across Kenya who trust FarmConnect to maximize their revenue
           </p>
           <div className="mt-8">
             <button className="bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-8 rounded-lg text-lg transition-colors">
@@ -35,9 +35,9 @@ const Index = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
             <div className="col-span-2">
-              <h3 className="text-2xl font-bold mb-4">FarmConnect</h3>
+              <h3 className="text-2xl font-bold mb-4">FarmConnect Kenya</h3>
               <p className="text-gray-300">
-                Connecting farmers with profitable markets and buyers nationwide.
+                Connecting Kenyan farmers with profitable markets and buyers nationwide.
                 Empowering agricultural communities through technology.
               </p>
             </div>
@@ -59,7 +59,7 @@ const Index = () => {
             </div>
           </div>
           <div className="border-t border-gray-700 mt-8 pt-8 text-center text-gray-300">
-            <p>&copy; 2024 FarmConnect. All rights reserved.</p>
+            <p>&copy; 2024 FarmConnect Kenya. All rights reserved.</p>
           </div>
         </div>
       </footer>

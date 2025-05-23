@@ -1,8 +1,10 @@
+
 import React from 'react';
 import Navigation from '@/components/Navigation';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { MapPin, Phone, Star, Users } from 'lucide-react';
+import { toast } from "@/components/ui/use-toast";
 
 const Buyers = () => {
   const buyers = [
@@ -43,6 +45,21 @@ const Buyers = () => {
       image: 'https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?auto=format&fit=crop&w=400&q=80'
     },
   ];
+
+  const handleContactClick = (buyerName: string, phone: string) => {
+    // In a real app, this could initiate a call or messaging functionality
+    toast({
+      title: `Contacting ${buyerName}`,
+      description: `Connecting you to ${phone}`,
+    });
+  };
+
+  const handleFilterClick = (filter: string) => {
+    toast({
+      title: `Filter Applied: ${filter}`,
+      description: "Filtering buyers by selected category",
+    });
+  };
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -106,7 +123,11 @@ const Buyers = () => {
                               <Phone className="h-4 w-4 mr-1" />
                               {buyer.phone}
                             </div>
-                            <Button size="sm" className="bg-green-600 hover:bg-green-700">
+                            <Button 
+                              size="sm" 
+                              className="bg-green-600 hover:bg-green-700"
+                              onClick={() => handleContactClick(buyer.name, buyer.phone)}
+                            >
                               Contact
                             </Button>
                           </div>
@@ -143,19 +164,19 @@ const Buyers = () => {
                 <CardTitle>Quick Filters</CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
-                <Button variant="outline" className="w-full justify-start">
+                <Button variant="outline" className="w-full justify-start" onClick={() => handleFilterClick('Supermarkets')}>
                   <Users className="h-4 w-4 mr-2" />
                   Supermarkets
                 </Button>
-                <Button variant="outline" className="w-full justify-start">
+                <Button variant="outline" className="w-full justify-start" onClick={() => handleFilterClick('Local Markets')}>
                   <Users className="h-4 w-4 mr-2" />
                   Local Markets
                 </Button>
-                <Button variant="outline" className="w-full justify-start">
+                <Button variant="outline" className="w-full justify-start" onClick={() => handleFilterClick('Wholesale Buyers')}>
                   <Users className="h-4 w-4 mr-2" />
                   Wholesale Buyers
                 </Button>
-                <Button variant="outline" className="w-full justify-start">
+                <Button variant="outline" className="w-full justify-start" onClick={() => handleFilterClick('Exporters')}>
                   <Users className="h-4 w-4 mr-2" />
                   Exporters
                 </Button>

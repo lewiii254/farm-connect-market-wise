@@ -4,6 +4,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Sprout, Menu, X } from 'lucide-react';
 import { useState } from 'react';
+import { toast } from "@/components/ui/use-toast";
 
 const Navigation = () => {
   const location = useLocation();
@@ -15,6 +16,13 @@ const Navigation = () => {
     { path: '/buyers', label: 'Find Buyers' },
     { path: '/dashboard', label: 'Dashboard' }
   ];
+
+  const handleSignUp = () => {
+    toast({
+      title: "Sign Up",
+      description: "Sign Up functionality coming soon!",
+    });
+  };
 
   return (
     <nav className="bg-white shadow-md sticky top-0 z-50">
@@ -43,7 +51,7 @@ const Navigation = () => {
                   {item.label}
                 </Link>
               ))}
-              <Button className="bg-green-600 hover:bg-green-700">
+              <Button className="bg-green-600 hover:bg-green-700" onClick={handleSignUp}>
                 Sign Up
               </Button>
             </div>
@@ -79,7 +87,7 @@ const Navigation = () => {
                 </Link>
               ))}
               <div className="px-3 py-2">
-                <Button className="w-full bg-green-600 hover:bg-green-700">
+                <Button className="w-full bg-green-600 hover:bg-green-700" onClick={handleSignUp}>
                   Sign Up
                 </Button>
               </div>

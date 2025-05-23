@@ -1,8 +1,10 @@
+
 import React from 'react';
 import Navigation from '@/components/Navigation';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { TrendingUp, DollarSign, Users, Bell, Plus } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 const Dashboard = () => {
   const dashboardStats = [
@@ -70,7 +72,7 @@ const Dashboard = () => {
                 Welcome back, Wanjiku! Here's your farming business overview.
               </p>
             </div>
-            <Button className="bg-green-600 hover:bg-green-700">
+            <Button className="bg-green-600 hover:bg-green-700" onClick={() => alert("Add New Listing functionality will be available soon!")}>
               <Plus className="h-4 w-4 mr-2" />
               Add New Listing
             </Button>
@@ -129,19 +131,23 @@ const Dashboard = () => {
               <CardDescription>Manage your farming business</CardDescription>
             </CardHeader>
             <CardContent className="space-y-3">
-              <Button variant="outline" className="w-full justify-start">
-                <TrendingUp className="h-4 w-4 mr-2" />
-                Check Market Prices
-              </Button>
-              <Button variant="outline" className="w-full justify-start">
-                <Users className="h-4 w-4 mr-2" />
-                Find New Buyers
-              </Button>
-              <Button variant="outline" className="w-full justify-start">
+              <Link to="/markets">
+                <Button variant="outline" className="w-full justify-start">
+                  <TrendingUp className="h-4 w-4 mr-2" />
+                  Check Market Prices
+                </Button>
+              </Link>
+              <Link to="/buyers">
+                <Button variant="outline" className="w-full justify-start">
+                  <Users className="h-4 w-4 mr-2" />
+                  Find New Buyers
+                </Button>
+              </Link>
+              <Button variant="outline" className="w-full justify-start" onClick={() => alert("Price Alerts functionality will be available soon!")}>
                 <Bell className="h-4 w-4 mr-2" />
                 Set Price Alerts
               </Button>
-              <Button variant="outline" className="w-full justify-start">
+              <Button variant="outline" className="w-full justify-start" onClick={() => alert("Add Crop Listing functionality will be available soon!")}>
                 <Plus className="h-4 w-4 mr-2" />
                 Add Crop Listing
               </Button>
@@ -161,7 +167,7 @@ const Dashboard = () => {
               <p className="text-sm text-gray-500 mt-2">
                 Create your first listing to start connecting with Kenyan buyers
               </p>
-              <Button className="mt-4 bg-green-600 hover:bg-green-700">
+              <Button className="mt-4 bg-green-600 hover:bg-green-700" onClick={() => alert("Create Listing functionality will be available soon!")}>
                 <Plus className="h-4 w-4 mr-2" />
                 Create Listing
               </Button>

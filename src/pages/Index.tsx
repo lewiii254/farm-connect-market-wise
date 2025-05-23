@@ -4,6 +4,8 @@ import Navigation from '@/components/Navigation';
 import Hero from '@/components/Hero';
 import Features from '@/components/Features';
 import Stats from '@/components/Stats';
+import { Button } from '@/components/ui/button';
+import { Link } from 'react-router-dom';
 
 const Index = () => {
   return (
@@ -23,9 +25,11 @@ const Index = () => {
             Join hundreds of farmers across Kenya who trust FarmConnect to maximize their revenue
           </p>
           <div className="mt-8">
-            <button className="bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-8 rounded-lg text-lg transition-colors">
-              Get Started Today
-            </button>
+            <Link to="/dashboard">
+              <Button className="bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-8 text-lg">
+                Get Started Today
+              </Button>
+            </Link>
           </div>
         </div>
       </div>
@@ -44,17 +48,17 @@ const Index = () => {
             <div>
               <h4 className="text-lg font-semibold mb-4">Quick Links</h4>
               <ul className="space-y-2 text-gray-300">
-                <li><a href="/markets" className="hover:text-white">Market Prices</a></li>
-                <li><a href="/buyers" className="hover:text-white">Find Buyers</a></li>
-                <li><a href="/dashboard" className="hover:text-white">Dashboard</a></li>
+                <li><Link to="/markets" className="hover:text-white">Market Prices</Link></li>
+                <li><Link to="/buyers" className="hover:text-white">Find Buyers</Link></li>
+                <li><Link to="/dashboard" className="hover:text-white">Dashboard</Link></li>
               </ul>
             </div>
             <div>
               <h4 className="text-lg font-semibold mb-4">Support</h4>
               <ul className="space-y-2 text-gray-300">
-                <li><a href="#" className="hover:text-white">Help Center</a></li>
-                <li><a href="#" className="hover:text-white">Contact Us</a></li>
-                <li><a href="#" className="hover:text-white">Terms & Privacy</a></li>
+                <li><Link to="/" className="hover:text-white">Help Center</Link></li>
+                <li><Link to="/" className="hover:text-white">Contact Us</Link></li>
+                <li><Link to="/" className="hover:text-white">Terms & Privacy</Link></li>
               </ul>
             </div>
           </div>

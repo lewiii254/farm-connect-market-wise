@@ -6,6 +6,7 @@ import Features from '@/components/Features';
 import Stats from '@/components/Stats';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
+import { Users, TruckIcon } from 'lucide-react';
 
 const Index = () => {
   return (
@@ -14,6 +15,62 @@ const Index = () => {
       <Hero />
       <Features />
       <Stats />
+      
+      {/* New Features Section */}
+      <div className="bg-gray-100 py-16">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-extrabold text-gray-900 sm:text-4xl">
+              New Features for Kenyan Farmers
+            </h2>
+            <p className="mt-4 text-xl text-gray-600">
+              We've added powerful new tools to help your farming business grow
+            </p>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            {/* Community Feature */}
+            <div className="bg-white rounded-lg shadow-lg overflow-hidden">
+              <div className="p-6">
+                <div className="flex items-center justify-center w-12 h-12 bg-green-100 rounded-full mb-4">
+                  <Users className="h-6 w-6 text-green-600" />
+                </div>
+                <h3 className="text-xl font-bold text-gray-900 mb-2">Farmer Community</h3>
+                <p className="text-gray-600 mb-4">
+                  Connect with other farmers across Kenya to share knowledge, discuss challenges, and form partnerships to access larger markets together.
+                </p>
+                <div className="mt-4">
+                  <Link to="/community">
+                    <Button className="bg-green-600 hover:bg-green-700 text-white">
+                      Join Community
+                    </Button>
+                  </Link>
+                </div>
+              </div>
+            </div>
+            
+            {/* Supply Chain Feature */}
+            <div className="bg-white rounded-lg shadow-lg overflow-hidden">
+              <div className="p-6">
+                <div className="flex items-center justify-center w-12 h-12 bg-green-100 rounded-full mb-4">
+                  <TruckIcon className="h-6 w-6 text-green-600" />
+                </div>
+                <h3 className="text-xl font-bold text-gray-900 mb-2">Supply Chain Tracking</h3>
+                <p className="text-gray-600 mb-4">
+                  Monitor your produce from farm to market, ensuring quality and transparency. Track shipments and maintain quality certification for better market prices.
+                </p>
+                <div className="mt-4">
+                  <Link to="/supply-chain">
+                    <Button className="bg-green-600 hover:bg-green-700 text-white">
+                      Track Your Produce
+                    </Button>
+                  </Link>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
       
       {/* CTA Section */}
       <div className="bg-white py-16">
@@ -50,6 +107,8 @@ const Index = () => {
               <ul className="space-y-2 text-gray-300">
                 <li><Link to="/markets" className="hover:text-white">Market Prices</Link></li>
                 <li><Link to="/buyers" className="hover:text-white">Find Buyers</Link></li>
+                <li><Link to="/community" className="hover:text-white">Community</Link></li>
+                <li><Link to="/supply-chain" className="hover:text-white">Supply Chain</Link></li>
                 <li><Link to="/dashboard" className="hover:text-white">Dashboard</Link></li>
               </ul>
             </div>

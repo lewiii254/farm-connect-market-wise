@@ -2,9 +2,9 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Sprout, Menu, X } from 'lucide-react';
+import { Sprout, Menu, X, Users, TruckIcon } from 'lucide-react';
 import { useState } from 'react';
-import { toast } from "@/components/ui/use-toast";
+import { toast } from "@/hooks/use-toast";
 
 const Navigation = () => {
   const location = useLocation();
@@ -14,7 +14,9 @@ const Navigation = () => {
     { path: '/', label: 'Home' },
     { path: '/markets', label: 'Market Prices' },
     { path: '/buyers', label: 'Find Buyers' },
-    { path: '/dashboard', label: 'Dashboard' }
+    { path: '/dashboard', label: 'Dashboard' },
+    { path: '/community', label: 'Community' },
+    { path: '/supply-chain', label: 'Supply Chain' }
   ];
 
   const handleSignUp = () => {
@@ -37,7 +39,7 @@ const Navigation = () => {
 
           {/* Desktop Navigation */}
           <div className="hidden md:block">
-            <div className="flex items-center space-x-8">
+            <div className="flex items-center space-x-6">
               {navItems.map((item) => (
                 <Link
                   key={item.path}

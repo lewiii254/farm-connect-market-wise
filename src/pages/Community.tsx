@@ -1,4 +1,3 @@
-
 import React from 'react';
 import Navigation from '@/components/Navigation';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -37,7 +36,7 @@ const Community = () => {
       members: 76,
       description: 'Focused on drought-resistant crops suitable for Machakos county farmers.',
       image: 'https://images.unsplash.com/photo-1620857493809-cce7a0d8ec3b?q=80&w=100&auto=format&fit=crop'
-    },
+    }
   ];
 
   const forumPosts = [

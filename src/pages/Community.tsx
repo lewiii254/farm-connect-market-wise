@@ -1,10 +1,15 @@
 import React from 'react';
 import Navigation from '@/components/Navigation';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import PrivateMessaging from '@/components/PrivateMessaging';
+import EventCalendar from '@/components/EventCalendar';
+import KnowledgeBase from '@/components/KnowledgeBase';
+import MentorshipMatching from '@/components/MentorshipMatching';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Input } from '@/components/ui/input';
-import { Users, MessageSquare, Heart, Share2, Plus } from 'lucide-react';
+import { Users, MessageSquare, Heart, Share2, Plus, Calendar, BookOpen, UserCheck } from 'lucide-react';
 import { toast } from "@/hooks/use-toast";
 
 const Community = () => {
@@ -117,138 +122,177 @@ const Community = () => {
       
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="mb-8">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900">Farmer Community</h1>
-              <p className="mt-2 text-lg text-gray-600">
-                Connect with other farmers across Kenya to share knowledge and build partnerships.
-              </p>
-            </div>
-            <Button className="bg-green-600 hover:bg-green-700" onClick={handleCreatePost}>
-              <Plus className="h-4 w-4 mr-2" />
-              Create Post
-            </Button>
-          </div>
+          <h1 className="text-3xl font-bold text-gray-900">Farmer Community</h1>
+          <p className="mt-2 text-lg text-gray-600">
+            Connect with other farmers across Kenya to share knowledge and build partnerships.
+          </p>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Forum Posts */}
-          <div className="lg:col-span-2 space-y-6">
-            {/* Post creation card */}
-            <Card>
-              <CardContent className="pt-6">
-                <div className="flex items-center space-x-4">
-                  <Avatar>
-                    <AvatarFallback className="bg-green-100 text-green-800">WM</AvatarFallback>
-                  </Avatar>
-                  <div className="flex-grow">
-                    <Input 
-                      placeholder="Share farming updates or ask questions..." 
-                      className="bg-gray-100"
-                      onClick={handleCreatePost}
-                    />
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-            
-            {/* Forum posts */}
-            {forumPosts.map((post) => (
-              <Card key={post.id}>
-                <CardContent className="pt-6">
-                  <div className="flex items-start space-x-4">
-                    <Avatar>
-                      <AvatarFallback className="bg-green-100 text-green-800">{post.avatar}</AvatarFallback>
-                    </Avatar>
-                    <div className="flex-grow">
-                      <div className="flex justify-between items-center">
-                        <h3 className="font-medium">{post.author}</h3>
-                        <p className="text-sm text-gray-500">{post.time}</p>
-                      </div>
-                      <p className="mt-2 text-gray-700">{post.content}</p>
-                      <div className="flex items-center space-x-6 mt-4 text-sm text-gray-500">
-                        <button 
-                          className="flex items-center space-x-2 hover:text-green-600"
-                          onClick={() => handleLikePost(post.id)}
-                        >
-                          <Heart className="h-4 w-4" />
-                          <span>{post.likes} Likes</span>
-                        </button>
-                        <button 
-                          className="flex items-center space-x-2 hover:text-green-600"
-                          onClick={handleCommentPost}
-                        >
-                          <MessageSquare className="h-4 w-4" />
-                          <span>{post.comments} Comments</span>
-                        </button>
-                        <button 
-                          className="flex items-center space-x-2 hover:text-green-600"
-                          onClick={handleSharePost}
-                        >
-                          <Share2 className="h-4 w-4" />
-                          <span>Share</span>
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
+        <Tabs defaultValue="forum" className="space-y-6">
+          <TabsList className="grid w-full grid-cols-5">
+            <TabsTrigger value="forum" className="flex items-center gap-2">
+              <MessageSquare className="h-4 w-4" />
+              Forum
+            </TabsTrigger>
+            <TabsTrigger value="messages" className="flex items-center gap-2">
+              <MessageSquare className="h-4 w-4" />
+              Messages
+            </TabsTrigger>
+            <TabsTrigger value="events" className="flex items-center gap-2">
+              <Calendar className="h-4 w-4" />
+              Events
+            </TabsTrigger>
+            <TabsTrigger value="knowledge" className="flex items-center gap-2">
+              <BookOpen className="h-4 w-4" />
+              Knowledge
+            </TabsTrigger>
+            <TabsTrigger value="mentorship" className="flex items-center gap-2">
+              <UserCheck className="h-4 w-4" />
+              Mentorship
+            </TabsTrigger>
+          </TabsList>
 
-          {/* Farmer Groups */}
-          <div className="space-y-6">
-            <Card>
-              <CardHeader>
-                <div className="flex justify-between items-center">
-                  <CardTitle className="text-xl">Farmer Groups</CardTitle>
-                  <Button 
-                    variant="outline" 
-                    size="sm" 
-                    className="text-green-600"
-                    onClick={handleCreateGroup}
-                  >
-                    <Plus className="h-4 w-4 mr-1" /> New Group
-                  </Button>
-                </div>
-                <CardDescription>Connect with farming communities</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  {farmersGroups.map((group) => (
-                    <div key={group.id} className="flex items-start space-x-4 py-2">
-                      <div className="flex-shrink-0 h-10 w-10 rounded-md overflow-hidden">
-                        <img 
-                          src={group.image} 
-                          alt={group.name} 
-                          className="h-full w-full object-cover"
-                          onError={(e) => {
-                            (e.target as HTMLImageElement).src = 'https://placehold.co/40x40/228B22/FFFFFF?text=FG';
-                          }}
+          <TabsContent value="forum">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+              {/* Forum Posts */}
+              <div className="lg:col-span-2 space-y-6">
+                {/* Post creation card */}
+                <Card>
+                  <CardContent className="pt-6">
+                    <div className="flex items-center space-x-4">
+                      <Avatar>
+                        <AvatarFallback className="bg-green-100 text-green-800">WM</AvatarFallback>
+                      </Avatar>
+                      <div className="flex-grow">
+                        <Input 
+                          placeholder="Share farming updates or ask questions..." 
+                          className="bg-gray-100"
+                          onClick={handleCreatePost}
                         />
                       </div>
-                      <div className="flex-grow">
-                        <h4 className="font-medium text-gray-900">{group.name}</h4>
-                        <div className="flex items-center text-sm text-gray-500">
-                          <Users className="h-3 w-3 mr-1" />
-                          <span>{group.members} members</span>
-                        </div>
-                        <Button 
-                          variant="ghost" 
-                          size="sm" 
-                          className="mt-1 text-green-600 p-0 h-auto hover:text-green-800 hover:bg-transparent"
-                          onClick={() => handleJoinGroup(group.name)}
-                        >
-                          Join Group
-                        </Button>
-                      </div>
+                      <Button className="bg-green-600 hover:bg-green-700" onClick={handleCreatePost}>
+                        <Plus className="h-4 w-4 mr-2" />
+                        Post
+                      </Button>
                     </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-        </div>
+                  </CardContent>
+                </Card>
+                
+                {/* Forum posts */}
+                {forumPosts.map((post) => (
+                  <Card key={post.id}>
+                    <CardContent className="pt-6">
+                      <div className="flex items-start space-x-4">
+                        <Avatar>
+                          <AvatarFallback className="bg-green-100 text-green-800">{post.avatar}</AvatarFallback>
+                        </Avatar>
+                        <div className="flex-grow">
+                          <div className="flex justify-between items-center">
+                            <h3 className="font-medium">{post.author}</h3>
+                            <p className="text-sm text-gray-500">{post.time}</p>
+                          </div>
+                          <p className="mt-2 text-gray-700">{post.content}</p>
+                          <div className="flex items-center space-x-6 mt-4 text-sm text-gray-500">
+                            <button 
+                              className="flex items-center space-x-2 hover:text-green-600"
+                              onClick={() => handleLikePost(post.id)}
+                            >
+                              <Heart className="h-4 w-4" />
+                              <span>{post.likes} Likes</span>
+                            </button>
+                            <button 
+                              className="flex items-center space-x-2 hover:text-green-600"
+                              onClick={handleCommentPost}
+                            >
+                              <MessageSquare className="h-4 w-4" />
+                              <span>{post.comments} Comments</span>
+                            </button>
+                            <button 
+                              className="flex items-center space-x-2 hover:text-green-600"
+                              onClick={handleSharePost}
+                            >
+                              <Share2 className="h-4 w-4" />
+                              <span>Share</span>
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+
+              {/* Farmer Groups */}
+              <div className="space-y-6">
+                <Card>
+                  <CardHeader>
+                    <div className="flex justify-between items-center">
+                      <CardTitle className="text-xl">Farmer Groups</CardTitle>
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        className="text-green-600"
+                        onClick={handleCreateGroup}
+                      >
+                        <Plus className="h-4 w-4 mr-1" /> New Group
+                      </Button>
+                    </div>
+                    <CardDescription>Connect with farming communities</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-4">
+                      {farmersGroups.map((group) => (
+                        <div key={group.id} className="flex items-start space-x-4 py-2">
+                          <div className="flex-shrink-0 h-10 w-10 rounded-md overflow-hidden">
+                            <img 
+                              src={group.image} 
+                              alt={group.name} 
+                              className="h-full w-full object-cover"
+                              onError={(e) => {
+                                (e.target as HTMLImageElement).src = 'https://placehold.co/40x40/228B22/FFFFFF?text=FG';
+                              }}
+                            />
+                          </div>
+                          <div className="flex-grow">
+                            <h4 className="font-medium text-gray-900">{group.name}</h4>
+                            <div className="flex items-center text-sm text-gray-500">
+                              <Users className="h-3 w-3 mr-1" />
+                              <span>{group.members} members</span>
+                            </div>
+                            <Button 
+                              variant="ghost" 
+                              size="sm" 
+                              className="mt-1 text-green-600 p-0 h-auto hover:text-green-800 hover:bg-transparent"
+                              onClick={() => handleJoinGroup(group.name)}
+                            >
+                              Join Group
+                            </Button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+            </div>
+          </TabsContent>
+
+          <TabsContent value="messages">
+            <PrivateMessaging />
+          </TabsContent>
+
+          <TabsContent value="events">
+            <EventCalendar />
+          </TabsContent>
+
+          <TabsContent value="knowledge">
+            <KnowledgeBase />
+          </TabsContent>
+
+          <TabsContent value="mentorship">
+            <MentorshipMatching />
+          </TabsContent>
+        </Tabs>
       </div>
     </div>
   );

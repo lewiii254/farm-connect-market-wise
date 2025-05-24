@@ -3,6 +3,11 @@ import React from 'react';
 import Navigation from '@/components/Navigation';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { TrendingUp, TrendingDown, Minus } from 'lucide-react';
+import PriceAlerts from '@/components/PriceAlerts';
+import MarketComparison from '@/components/MarketComparison';
+import PriceCharts from '@/components/PriceCharts';
+import CropSeasonality from '@/components/CropSeasonality';
+import DistanceCalculator from '@/components/DistanceCalculator';
 
 const Markets = () => {
   const marketData = [
@@ -84,47 +89,59 @@ const Markets = () => {
       
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">Market Prices</h1>
+          <h1 className="text-3xl font-bold text-gray-900">Market Intelligence</h1>
           <p className="mt-2 text-lg text-gray-600">
-            Real-time pricing information from markets across Kenya
+            Comprehensive market data, price trends, and farming insights for Kenyan farmers
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {marketData.map((item, index) => (
-            <Card key={index} className="hover-scale">
-              <CardHeader className="pb-3">
-                <div className="flex items-center justify-between">
-                  <CardTitle className="text-xl">{item.crop}</CardTitle>
-                  <div className="flex items-center space-x-1">
-                    {getTrendIcon(item.trend)}
-                    <span className={`text-sm font-medium ${getTrendColor(item.trend)}`}>
-                      {item.change}
-                    </span>
+        {/* Current Market Prices */}
+        <div className="mb-12">
+          <h2 className="text-2xl font-bold text-gray-900 mb-6">Current Market Prices</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {marketData.map((item, index) => (
+              <Card key={index} className="hover-scale">
+                <CardHeader className="pb-3">
+                  <div className="flex items-center justify-between">
+                    <CardTitle className="text-xl">{item.crop}</CardTitle>
+                    <div className="flex items-center space-x-1">
+                      {getTrendIcon(item.trend)}
+                      <span className={`text-sm font-medium ${getTrendColor(item.trend)}`}>
+                        {item.change}
+                      </span>
+                    </div>
                   </div>
-                </div>
-                <CardDescription>{item.market} • {item.location}</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold text-green-600 mb-2">
-                  {item.currentPrice}
-                </div>
-                <p className="text-sm text-gray-500">
-                  Updated 5 minutes ago
-                </p>
-              </CardContent>
-            </Card>
-          ))}
+                  <CardDescription>{item.market} • {item.location}</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold text-green-600 mb-2">
+                    {item.currentPrice}
+                  </div>
+                  <p className="text-sm text-gray-500">
+                    Updated 5 minutes ago
+                  </p>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
         </div>
 
-        <div className="mt-12 bg-white rounded-lg shadow-sm p-6">
-          <h2 className="text-2xl font-bold text-gray-900 mb-4">Price Trends</h2>
-          <div className="bg-gray-100 rounded-lg p-8 text-center">
-            <p className="text-gray-600">Interactive price charts coming soon!</p>
-            <p className="text-sm text-gray-500 mt-2">
-              Track historical pricing data and market trends across Kenya
-            </p>
+        {/* New Enhanced Features */}
+        <div className="space-y-12">
+          {/* Price Alerts and Market Comparison */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <PriceAlerts />
+            <DistanceCalculator />
           </div>
+
+          {/* Market Comparison */}
+          <MarketComparison />
+
+          {/* Price Charts */}
+          <PriceCharts />
+
+          {/* Crop Seasonality */}
+          <CropSeasonality />
         </div>
       </div>
     </div>

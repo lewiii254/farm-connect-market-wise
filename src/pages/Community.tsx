@@ -45,7 +45,7 @@ const Community = () => {
       author: 'Joseph Kamau',
       avatar: 'JK',
       time: '2 hours ago',
-      content: 'Has anyone tried the new disease-resistant maize variety from Kenya Seed Company? I'm considering planting it next season.',
+      content: "Has anyone tried the new disease-resistant maize variety from Kenya Seed Company? I'm considering planting it next season.",
       likes: 24,
       comments: 8
     },

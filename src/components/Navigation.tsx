@@ -16,7 +16,8 @@ const Navigation = () => {
     { path: '/buyers', label: 'Find Buyers' },
     { path: '/dashboard', label: 'Dashboard' },
     { path: '/community', label: 'Community' },
-    { path: '/supply-chain', label: 'Supply Chain' }
+    { path: '/supply-chain', label: 'Supply Chain' },
+    { path: '/financial-services', label: 'Financial Services' }
   ];
 
   const handleSignUp = () => {

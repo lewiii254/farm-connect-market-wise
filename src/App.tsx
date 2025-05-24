@@ -11,6 +11,7 @@ import Buyers from "./pages/Buyers";
 import Dashboard from "./pages/Dashboard";
 import Community from "./pages/Community";
 import SupplyChain from "./pages/SupplyChain";
+import FinancialServices from "./pages/FinancialServices";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -28,6 +29,7 @@ const App = () => (
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/community" element={<Community />} />
           <Route path="/supply-chain" element={<SupplyChain />} />
+          <Route path="/financial-services" element={<FinancialServices />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>

@@ -1,4 +1,3 @@
-
 # 🌾 FarmConnect Kenya 🇰🇪
 
 <div align="center">
@@ -11,6 +10,8 @@
 [![Built with React](https://img.shields.io/badge/Built%20with-React-61dafb.svg)](https://reactjs.org/)
 [![Powered by Vite](https://img.shields.io/badge/Powered%20by-Vite-646cff.svg)](https://vitejs.dev/)
 [![Styled with Tailwind](https://img.shields.io/badge/Styled%20with-Tailwind-38bdf8.svg)](https://tailwindcss.com/)
+
+### 📊 [View Our Investor Pitch Deck](https://gamma.app/docs/FarmConnect-Kenya-Empowering-Smallholder-Farmers-Through-Digital--2t7mdmme1ka0jfh) 📊
 
 </div>
 
@@ -264,6 +265,7 @@ If you find FarmConnect Kenya helpful, please consider:
 📱 **WhatsApp:** +254 700 123 456  
 🐦 **Twitter:** [@FarmConnectKE](https://twitter.com/farmconnectke)  
 📘 **Facebook:** [FarmConnect Kenya](https://facebook.com/farmconnectkenya)  
+📊 **Pitch Deck:** [View Our Investor Presentation](https://gamma.app/docs/FarmConnect-Kenya-Empowering-Smallholder-Farmers-Through-Digital--2t7mdmme1ka0jfh)
 
 ### 💬 Community Support
 - 💬 **Discord:** [Join our community](https://discord.gg/farmconnect)
@@ -287,3 +289,5 @@ If you find FarmConnect Kenya helpful, please consider:
 ⭐ **Star us on GitHub** — it helps a lot! ⭐
 
 </div>
+
+</initial_code>

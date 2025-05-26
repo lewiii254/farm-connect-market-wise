@@ -1,9 +1,7 @@
 # 🌾 FarmConnect Kenya 🇰🇪
 
 <div align="center">
-
-![FarmConnect Kenya Logo](https://images.unsplash.com/photo-1469041797191-50ace28483c3?auto=format&fit=crop&w=600&q=80)
-
+   
 ### 🚀 Empowering Kenyan Farmers Through Digital Innovation 🌱
 
 [![Made with Love](https://img.shields.io/badge/Made%20with-❤️-red.svg)](https://lovable.dev)

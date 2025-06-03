@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -229,6 +230,26 @@ const BuyerProfile = () => {
     }
   };
 
+  // Helper function to safely render SelectItems
+  const renderSelectItems = (items: string[], labelTransform?: (item: string) => string) => {
+    return items
+      .filter(item => isValidValue(item)) // Double check validation
+      .map((item) => {
+        // Triple check before rendering - absolutely no empty strings
+        if (!item || item.trim() === '' || item.length === 0) {
+          console.warn('Skipping invalid item:', item);
+          return null;
+        }
+        
+        return (
+          <SelectItem key={item} value={item}>
+            {labelTransform ? labelTransform(item) : item}
+          </SelectItem>
+        );
+      })
+      .filter(Boolean); // Remove any null items
+  };
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -294,16 +315,7 @@ const BuyerProfile = () => {
                     <SelectValue placeholder="Select business type" />
                   </SelectTrigger>
                   <SelectContent>
-                    {BUSINESS_TYPES
-                      .filter(type => isValidValue(type))
-                      .map((type) => {
-                        console.log('Rendering business type:', type, 'Length:', type.length);
-                        return (
-                          <SelectItem key={type} value={type}>
-                            {type.charAt(0).toUpperCase() + type.slice(1)}
-                          </SelectItem>
-                        );
-                      })}
+                    {renderSelectItems(BUSINESS_TYPES, (type) => type.charAt(0).toUpperCase() + type.slice(1))}
                   </SelectContent>
                 </Select>
               </div>
@@ -323,16 +335,7 @@ const BuyerProfile = () => {
                     <SelectValue placeholder="Select location" />
                   </SelectTrigger>
                   <SelectContent>
-                    {KENYAN_COUNTIES
-                      .filter(county => isValidValue(county))
-                      .map((county) => {
-                        console.log('Rendering county:', county, 'Length:', county.length);
-                        return (
-                          <SelectItem key={county} value={county}>
-                            {county}
-                          </SelectItem>
-                        );
-                      })}
+                    {renderSelectItems(KENYAN_COUNTIES)}
                   </SelectContent>
                 </Select>
               </div>

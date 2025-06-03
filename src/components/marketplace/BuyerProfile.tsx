@@ -31,7 +31,7 @@ const BUSINESS_TYPES = [
   'retailer',
   'hotel',
   'institution'
-].filter(type => type && type.trim() !== '');
+].filter(type => type && type.trim() !== '' && type.length > 0);
 
 const KENYAN_COUNTIES = [
   'Nairobi',
@@ -48,7 +48,7 @@ const KENYAN_COUNTIES = [
   'Meru',
   'Nyeri',
   'Kericho'
-].filter(county => county && county.trim() !== '');
+].filter(county => county && county.trim() !== '' && county.length > 0);
 
 const AVAILABLE_CROPS = [
   'Maize',
@@ -62,7 +62,7 @@ const AVAILABLE_CROPS = [
   'Onions',
   'Cabbage',
   'Spinach'
-].filter(crop => crop && crop.trim() !== '');
+].filter(crop => crop && crop.trim() !== '' && crop.length > 0);
 
 const BuyerProfile = () => {
   const { user } = useAuth();
@@ -203,7 +203,7 @@ const BuyerProfile = () => {
   };
 
   const toggleCrop = (crop: string) => {
-    if (!AVAILABLE_CROPS.includes(crop)) {
+    if (!AVAILABLE_CROPS.includes(crop) || !isValidValue(crop)) {
       console.warn('Invalid crop value:', crop);
       return;
     }
@@ -214,6 +214,10 @@ const BuyerProfile = () => {
         ? prev.preferred_crops.filter(c => c !== crop)
         : [...prev.preferred_crops, crop]
     }));
+  };
+
+  const isValidValue = (value: string): boolean => {
+    return value && typeof value === 'string' && value.trim() !== '' && value.length > 0;
   };
 
   const getVerificationColor = (status: string) => {
@@ -281,7 +285,7 @@ const BuyerProfile = () => {
                   value={formData.business_type || undefined} 
                   onValueChange={(value) => {
                     console.log('Business type selected:', value);
-                    if (BUSINESS_TYPES.includes(value)) {
+                    if (BUSINESS_TYPES.includes(value) && isValidValue(value)) {
                       setFormData({...formData, business_type: value});
                     }
                   }}
@@ -290,18 +294,16 @@ const BuyerProfile = () => {
                     <SelectValue placeholder="Select business type" />
                   </SelectTrigger>
                   <SelectContent>
-                    {BUSINESS_TYPES.map((type) => {
-                      console.log('Rendering business type:', type, 'Length:', type.length);
-                      if (!type || type.trim() === '') {
-                        console.error('Found empty business type!');
-                        return null;
-                      }
-                      return (
-                        <SelectItem key={type} value={type}>
-                          {type.charAt(0).toUpperCase() + type.slice(1)}
-                        </SelectItem>
-                      );
-                    })}
+                    {BUSINESS_TYPES
+                      .filter(type => isValidValue(type))
+                      .map((type) => {
+                        console.log('Rendering business type:', type, 'Length:', type.length);
+                        return (
+                          <SelectItem key={type} value={type}>
+                            {type.charAt(0).toUpperCase() + type.slice(1)}
+                          </SelectItem>
+                        );
+                      })}
                   </SelectContent>
                 </Select>
               </div>
@@ -312,7 +314,7 @@ const BuyerProfile = () => {
                   value={formData.location || undefined} 
                   onValueChange={(value) => {
                     console.log('Location selected:', value);
-                    if (KENYAN_COUNTIES.includes(value)) {
+                    if (KENYAN_COUNTIES.includes(value) && isValidValue(value)) {
                       setFormData({...formData, location: value});
                     }
                   }}
@@ -321,18 +323,16 @@ const BuyerProfile = () => {
                     <SelectValue placeholder="Select location" />
                   </SelectTrigger>
                   <SelectContent>
-                    {KENYAN_COUNTIES.map((county) => {
-                      console.log('Rendering county:', county, 'Length:', county.length);
-                      if (!county || county.trim() === '') {
-                        console.error('Found empty county!');
-                        return null;
-                      }
-                      return (
-                        <SelectItem key={county} value={county}>
-                          {county}
-                        </SelectItem>
-                      );
-                    })}
+                    {KENYAN_COUNTIES
+                      .filter(county => isValidValue(county))
+                      .map((county) => {
+                        console.log('Rendering county:', county, 'Length:', county.length);
+                        return (
+                          <SelectItem key={county} value={county}>
+                            {county}
+                          </SelectItem>
+                        );
+                      })}
                   </SelectContent>
                 </Select>
               </div>
@@ -364,19 +364,21 @@ const BuyerProfile = () => {
             <div className="space-y-2">
               <Label>Preferred Crops</Label>
               <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
-                {AVAILABLE_CROPS.map((crop) => (
-                  <div key={crop} className="flex items-center space-x-2">
-                    <Button
-                      type="button"
-                      variant={formData.preferred_crops.includes(crop) ? "default" : "outline"}
-                      size="sm"
-                      onClick={() => toggleCrop(crop)}
-                      className={formData.preferred_crops.includes(crop) ? "bg-green-600 hover:bg-green-700" : ""}
-                    >
-                      {crop}
-                    </Button>
-                  </div>
-                ))}
+                {AVAILABLE_CROPS
+                  .filter(crop => isValidValue(crop))
+                  .map((crop) => (
+                    <div key={crop} className="flex items-center space-x-2">
+                      <Button
+                        type="button"
+                        variant={formData.preferred_crops.includes(crop) ? "default" : "outline"}
+                        size="sm"
+                        onClick={() => toggleCrop(crop)}
+                        className={formData.preferred_crops.includes(crop) ? "bg-green-600 hover:bg-green-700" : ""}
+                      >
+                        {crop}
+                      </Button>
+                    </div>
+                  ))}
               </div>
             </div>
 

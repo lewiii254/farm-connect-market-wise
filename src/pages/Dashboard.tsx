@@ -1,37 +1,97 @@
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import Navigation from '@/components/Navigation';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { TrendingUp, DollarSign, Users, Bell, Plus } from 'lucide-react';
+import { TrendingUp, DollarSign, Users, Bell, Plus, Package, ShoppingCart } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { useAuth } from '@/hooks/useAuth';
+import { supabase } from '@/integrations/supabase/client';
+import CropListingForm from '@/components/marketplace/CropListingForm';
 
 const Dashboard = () => {
+  const { user } = useAuth();
+  const [showListingForm, setShowListingForm] = useState(false);
+  const [dashboardData, setDashboardData] = useState({
+    totalListings: 0,
+    totalRevenue: 0,
+    activeOrders: 0,
+    priceAlerts: 0,
+  });
+
+  useEffect(() => {
+    if (user) {
+      fetchDashboardData();
+    }
+  }, [user]);
+
+  const fetchDashboardData = async () => {
+    if (!user) return;
+
+    try {
+      // Fetch user's crop listings
+      const { data: listings } = await supabase
+        .from('crop_listings')
+        .select('*')
+        .eq('farmer_id', user.id);
+
+      // Fetch user's orders (as farmer)
+      const { data: orders } = await supabase
+        .from('orders')
+        .select('*')
+        .eq('farmer_id', user.id);
+
+      // Fetch user's price alerts
+      const { data: alerts } = await supabase
+        .from('price_alerts')
+        .select('*')
+        .eq('user_id', user.id)
+        .eq('is_active', true);
+
+      const totalRevenue = orders?.reduce((sum, order) => {
+        return order.status === 'delivered' ? sum + order.total_amount : sum;
+      }, 0) || 0;
+
+      const activeOrders = orders?.filter(order => 
+        ['confirmed', 'paid', 'in_transit'].includes(order.status)
+      ).length || 0;
+
+      setDashboardData({
+        totalListings: listings?.length || 0,
+        totalRevenue,
+        activeOrders,
+        priceAlerts: alerts?.length || 0,
+      });
+    } catch (error) {
+      console.error('Error fetching dashboard data:', error);
+    }
+  };
+
   const dashboardStats = [
     {
       title: 'Total Revenue',
-      value: 'KSh 42,450',
+      value: `KSh ${dashboardData.totalRevenue.toLocaleString()}`,
       change: '+12.5%',
       icon: DollarSign,
       color: 'text-green-600',
     },
     {
       title: 'Active Listings',
-      value: '24',
+      value: dashboardData.totalListings.toString(),
       change: '+3',
-      icon: TrendingUp,
+      icon: Package,
       color: 'text-blue-600',
     },
     {
-      title: 'Connected Buyers',
-      value: '18',
+      title: 'Active Orders',
+      value: dashboardData.activeOrders.toString(),
       change: '+5',
-      icon: Users,
+      icon: ShoppingCart,
       color: 'text-purple-600',
     },
     {
       title: 'Price Alerts',
-      value: '7',
+      value: dashboardData.priceAlerts.toString(),
       change: '+2',
       icon: Bell,
       color: 'text-orange-600',
@@ -69,15 +129,28 @@ const Dashboard = () => {
             <div>
               <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
               <p className="mt-2 text-lg text-gray-600">
-                Welcome back, Wanjiku! Here's your farming business overview.
+                Welcome back! Here's your farming business overview.
               </p>
             </div>
-            <Button className="bg-green-600 hover:bg-green-700" onClick={() => alert("Add New Listing functionality will be available soon!")}>
+            <Button 
+              className="bg-green-600 hover:bg-green-700" 
+              onClick={() => setShowListingForm(!showListingForm)}
+            >
               <Plus className="h-4 w-4 mr-2" />
-              Add New Listing
+              {showListingForm ? 'Hide Form' : 'Add New Listing'}
             </Button>
           </div>
         </div>
+
+        {/* Show listing form if toggled */}
+        {showListingForm && (
+          <div className="mb-8">
+            <CropListingForm onSuccess={() => {
+              setShowListingForm(false);
+              fetchDashboardData();
+            }} />
+          </div>
+        )}
 
         {/* Stats Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
@@ -143,14 +216,20 @@ const Dashboard = () => {
                   Find New Buyers
                 </Button>
               </Link>
-              <Button variant="outline" className="w-full justify-start" onClick={() => alert("Price Alerts functionality will be available soon!")}>
-                <Bell className="h-4 w-4 mr-2" />
-                Set Price Alerts
-              </Button>
-              <Button variant="outline" className="w-full justify-start" onClick={() => alert("Add Crop Listing functionality will be available soon!")}>
+              <Button 
+                variant="outline" 
+                className="w-full justify-start" 
+                onClick={() => setShowListingForm(true)}
+              >
                 <Plus className="h-4 w-4 mr-2" />
                 Add Crop Listing
               </Button>
+              <Link to="/markets">
+                <Button variant="outline" className="w-full justify-start">
+                  <Bell className="h-4 w-4 mr-2" />
+                  Set Price Alerts
+                </Button>
+              </Link>
             </CardContent>
           </Card>
         </div>
@@ -162,16 +241,32 @@ const Dashboard = () => {
             <CardDescription>Manage your active crop listings</CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="bg-gray-100 rounded-lg p-8 text-center">
-              <p className="text-gray-600">No active listings</p>
-              <p className="text-sm text-gray-500 mt-2">
-                Create your first listing to start connecting with Kenyan buyers
-              </p>
-              <Button className="mt-4 bg-green-600 hover:bg-green-700" onClick={() => alert("Create Listing functionality will be available soon!")}>
-                <Plus className="h-4 w-4 mr-2" />
-                Create Listing
-              </Button>
-            </div>
+            {dashboardData.totalListings > 0 ? (
+              <div className="text-center py-4">
+                <p className="text-gray-600 mb-4">
+                  You have {dashboardData.totalListings} active listing{dashboardData.totalListings > 1 ? 's' : ''}
+                </p>
+                <Link to="/buyers">
+                  <Button className="bg-green-600 hover:bg-green-700">
+                    View All Listings
+                  </Button>
+                </Link>
+              </div>
+            ) : (
+              <div className="bg-gray-100 rounded-lg p-8 text-center">
+                <p className="text-gray-600">No active listings</p>
+                <p className="text-sm text-gray-500 mt-2">
+                  Create your first listing to start connecting with Kenyan buyers
+                </p>
+                <Button 
+                  className="mt-4 bg-green-600 hover:bg-green-700" 
+                  onClick={() => setShowListingForm(true)}
+                >
+                  <Plus className="h-4 w-4 mr-2" />
+                  Create Listing
+                </Button>
+              </div>
+            )}
           </CardContent>
         </Card>
       </div>

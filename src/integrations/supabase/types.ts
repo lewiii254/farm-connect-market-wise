@@ -9,6 +9,173 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      buyers: {
+        Row: {
+          business_type: string
+          company_name: string
+          created_at: string
+          id: string
+          location: string
+          minimum_order_kg: number | null
+          phone_number: string
+          preferred_crops: string[] | null
+          updated_at: string
+          user_id: string
+          verification_status: string | null
+        }
+        Insert: {
+          business_type: string
+          company_name: string
+          created_at?: string
+          id?: string
+          location: string
+          minimum_order_kg?: number | null
+          phone_number: string
+          preferred_crops?: string[] | null
+          updated_at?: string
+          user_id: string
+          verification_status?: string | null
+        }
+        Update: {
+          business_type?: string
+          company_name?: string
+          created_at?: string
+          id?: string
+          location?: string
+          minimum_order_kg?: number | null
+          phone_number?: string
+          preferred_crops?: string[] | null
+          updated_at?: string
+          user_id?: string
+          verification_status?: string | null
+        }
+        Relationships: []
+      }
+      crop_listings: {
+        Row: {
+          available_from: string
+          available_until: string | null
+          created_at: string
+          crop_name: string
+          description: string | null
+          farmer_id: string
+          harvest_date: string | null
+          id: string
+          is_available: boolean | null
+          is_organic: boolean | null
+          location: string
+          price_per_kg: number
+          quantity_kg: number
+          updated_at: string
+        }
+        Insert: {
+          available_from?: string
+          available_until?: string | null
+          created_at?: string
+          crop_name: string
+          description?: string | null
+          farmer_id: string
+          harvest_date?: string | null
+          id?: string
+          is_available?: boolean | null
+          is_organic?: boolean | null
+          location: string
+          price_per_kg: number
+          quantity_kg: number
+          updated_at?: string
+        }
+        Update: {
+          available_from?: string
+          available_until?: string | null
+          created_at?: string
+          crop_name?: string
+          description?: string | null
+          farmer_id?: string
+          harvest_date?: string | null
+          id?: string
+          is_available?: boolean | null
+          is_organic?: boolean | null
+          location?: string
+          price_per_kg?: number
+          quantity_kg?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      market_prices: {
+        Row: {
+          created_at: string
+          crop_name: string
+          date: string
+          id: string
+          location: string
+          market_name: string
+          price_per_kg: number
+          source: string | null
+        }
+        Insert: {
+          created_at?: string
+          crop_name: string
+          date?: string
+          id?: string
+          location: string
+          market_name: string
+          price_per_kg: number
+          source?: string | null
+        }
+        Update: {
+          created_at?: string
+          crop_name?: string
+          date?: string
+          id?: string
+          location?: string
+          market_name?: string
+          price_per_kg?: number
+          source?: string | null
+        }
+        Relationships: []
+      }
+      messages: {
+        Row: {
+          content: string
+          created_at: string
+          id: string
+          is_read: boolean | null
+          order_id: string | null
+          recipient_id: string
+          sender_id: string
+          subject: string | null
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          id?: string
+          is_read?: boolean | null
+          order_id?: string | null
+          recipient_id: string
+          sender_id: string
+          subject?: string | null
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: string
+          is_read?: boolean | null
+          order_id?: string | null
+          recipient_id?: string
+          sender_id?: string
+          subject?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "messages_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       mpesa_transactions: {
         Row: {
           amount: number
@@ -48,6 +215,105 @@ export type Database = {
           transaction_type?: string | null
           updated_at?: string | null
           user_id?: string | null
+        }
+        Relationships: []
+      }
+      orders: {
+        Row: {
+          buyer_id: string
+          created_at: string
+          delivery_date: string | null
+          delivery_location: string | null
+          farmer_id: string
+          id: string
+          listing_id: string
+          mpesa_transaction_id: string | null
+          notes: string | null
+          payment_method: string | null
+          payment_status: string | null
+          quantity_kg: number
+          status: string | null
+          total_amount: number
+          updated_at: string
+        }
+        Insert: {
+          buyer_id: string
+          created_at?: string
+          delivery_date?: string | null
+          delivery_location?: string | null
+          farmer_id: string
+          id?: string
+          listing_id: string
+          mpesa_transaction_id?: string | null
+          notes?: string | null
+          payment_method?: string | null
+          payment_status?: string | null
+          quantity_kg: number
+          status?: string | null
+          total_amount: number
+          updated_at?: string
+        }
+        Update: {
+          buyer_id?: string
+          created_at?: string
+          delivery_date?: string | null
+          delivery_location?: string | null
+          farmer_id?: string
+          id?: string
+          listing_id?: string
+          mpesa_transaction_id?: string | null
+          notes?: string | null
+          payment_method?: string | null
+          payment_status?: string | null
+          quantity_kg?: number
+          status?: string | null
+          total_amount?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "orders_buyer_id_fkey"
+            columns: ["buyer_id"]
+            isOneToOne: false
+            referencedRelation: "buyers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "orders_listing_id_fkey"
+            columns: ["listing_id"]
+            isOneToOne: false
+            referencedRelation: "crop_listings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      price_alerts: {
+        Row: {
+          created_at: string
+          crop_name: string
+          id: string
+          is_active: boolean | null
+          location: string | null
+          target_price: number
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          crop_name: string
+          id?: string
+          is_active?: boolean | null
+          location?: string | null
+          target_price: number
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          crop_name?: string
+          id?: string
+          is_active?: boolean | null
+          location?: string | null
+          target_price?: number
+          user_id?: string
         }
         Relationships: []
       }

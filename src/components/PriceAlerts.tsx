@@ -1,69 +1,142 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Bell, Plus, X } from 'lucide-react';
-import { toast } from "@/hooks/use-toast";
+import { useAuth } from '@/hooks/useAuth';
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from '@/hooks/use-toast';
 
 interface PriceAlert {
-  id: number;
-  crop: string;
-  targetPrice: number;
-  condition: 'above' | 'below';
-  market: string;
+  id: string;
+  crop_name: string;
+  target_price: number;
+  location: string | null;
+  is_active: boolean;
+  created_at: string;
 }
 
 const PriceAlerts = () => {
-  const [alerts, setAlerts] = useState<PriceAlert[]>([
-    { id: 1, crop: 'Maize', targetPrice: 50, condition: 'above', market: 'Wakulima Market' },
-  ]);
+  const { user } = useAuth();
+  const [alerts, setAlerts] = useState<PriceAlert[]>([]);
   const [showForm, setShowForm] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [newAlert, setNewAlert] = useState({
-    crop: '',
-    targetPrice: '',
-    condition: 'above' as 'above' | 'below',
-    market: ''
+    crop_name: '',
+    target_price: '',
+    location: ''
   });
 
   const crops = ['Maize', 'Beans', 'Potatoes', 'Tomatoes', 'Kales (Sukuma Wiki)', 'Avocados'];
-  const markets = ['Wakulima Market', 'Kongowea Market', 'Nakuru Wholesale', 'Karatina Market', 'Eldoret Market', 'Kisumu Fresh Produce'];
+  const locations = ['Nairobi', 'Mombasa', 'Nakuru', 'Eldoret', 'Kisumu', 'Nyeri'];
 
-  const handleAddAlert = () => {
-    if (!newAlert.crop || !newAlert.targetPrice || !newAlert.market) {
+  useEffect(() => {
+    if (user) {
+      fetchAlerts();
+    }
+  }, [user]);
+
+  const fetchAlerts = async () => {
+    if (!user) return;
+
+    try {
+      const { data, error } = await supabase
+        .from('price_alerts')
+        .select('*')
+        .eq('user_id', user.id)
+        .eq('is_active', true)
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+      setAlerts(data || []);
+    } catch (error: any) {
+      console.error('Error fetching alerts:', error);
       toast({
-        title: "Missing Information",
-        description: "Please fill in all fields to create a price alert.",
+        title: "Error",
+        description: "Failed to load price alerts",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const handleAddAlert = async () => {
+    if (!user) {
+      toast({
+        title: "Authentication Required",
+        description: "Please log in to create price alerts.",
         variant: "destructive"
       });
       return;
     }
 
-    const alert: PriceAlert = {
-      id: Date.now(),
-      crop: newAlert.crop,
-      targetPrice: parseFloat(newAlert.targetPrice),
-      condition: newAlert.condition,
-      market: newAlert.market
-    };
+    if (!newAlert.crop_name || !newAlert.target_price) {
+      toast({
+        title: "Missing Information",
+        description: "Please fill in crop type and target price.",
+        variant: "destructive"
+      });
+      return;
+    }
 
-    setAlerts([...alerts, alert]);
-    setNewAlert({ crop: '', targetPrice: '', condition: 'above', market: '' });
-    setShowForm(false);
-    
-    toast({
-      title: "Price Alert Created",
-      description: `You'll be notified when ${newAlert.crop} goes ${newAlert.condition} KSh ${newAlert.targetPrice}/kg at ${newAlert.market}.`,
-    });
+    setIsLoading(true);
+
+    try {
+      const { error } = await supabase
+        .from('price_alerts')
+        .insert({
+          user_id: user.id,
+          crop_name: newAlert.crop_name,
+          target_price: parseFloat(newAlert.target_price),
+          location: newAlert.location || null,
+        });
+
+      if (error) throw error;
+
+      toast({
+        title: "Price Alert Created",
+        description: `You'll be notified when ${newAlert.crop_name} reaches KSh ${newAlert.target_price}/kg${newAlert.location ? ` in ${newAlert.location}` : ''}.`,
+      });
+
+      setNewAlert({ crop_name: '', target_price: '', location: '' });
+      setShowForm(false);
+      fetchAlerts();
+    } catch (error: any) {
+      console.error('Error creating alert:', error);
+      toast({
+        title: "Error",
+        description: error.message || "Failed to create price alert",
+        variant: "destructive"
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const handleDeleteAlert = (id: number) => {
-    setAlerts(alerts.filter(alert => alert.id !== id));
-    toast({
-      title: "Alert Deleted",
-      description: "Price alert has been removed.",
-    });
+  const handleDeleteAlert = async (id: string) => {
+    try {
+      const { error } = await supabase
+        .from('price_alerts')
+        .update({ is_active: false })
+        .eq('id', id);
+
+      if (error) throw error;
+
+      toast({
+        title: "Alert Deleted",
+        description: "Price alert has been removed.",
+      });
+
+      fetchAlerts();
+    } catch (error: any) {
+      console.error('Error deleting alert:', error);
+      toast({
+        title: "Error",
+        description: "Failed to delete price alert",
+        variant: "destructive"
+      });
+    }
   };
 
   return (
@@ -88,8 +161,8 @@ const PriceAlerts = () => {
       <CardContent>
         {showForm && (
           <div className="mb-6 p-4 bg-gray-50 rounded-lg space-y-4">
-            <div className="grid grid-cols-2 gap-4">
-              <Select value={newAlert.crop} onValueChange={(value) => setNewAlert({...newAlert, crop: value})}>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <Select value={newAlert.crop_name} onValueChange={(value) => setNewAlert({...newAlert, crop_name: value})}>
                 <SelectTrigger>
                   <SelectValue placeholder="Select crop" />
                 </SelectTrigger>
@@ -100,40 +173,31 @@ const PriceAlerts = () => {
                 </SelectContent>
               </Select>
               
-              <Select value={newAlert.market} onValueChange={(value) => setNewAlert({...newAlert, market: value})}>
+              <Input
+                type="number"
+                step="0.01"
+                min="0"
+                placeholder="Target price (KSh/kg)"
+                value={newAlert.target_price}
+                onChange={(e) => setNewAlert({...newAlert, target_price: e.target.value})}
+              />
+
+              <Select value={newAlert.location} onValueChange={(value) => setNewAlert({...newAlert, location: value})}>
                 <SelectTrigger>
-                  <SelectValue placeholder="Select market" />
+                  <SelectValue placeholder="Select location (optional)" />
                 </SelectTrigger>
                 <SelectContent>
-                  {markets.map(market => (
-                    <SelectItem key={market} value={market}>{market}</SelectItem>
+                  <SelectItem value="">Any location</SelectItem>
+                  {locations.map(location => (
+                    <SelectItem key={location} value={location}>{location}</SelectItem>
                   ))}
                 </SelectContent>
               </Select>
             </div>
             
-            <div className="grid grid-cols-2 gap-4">
-              <Select value={newAlert.condition} onValueChange={(value: 'above' | 'below') => setNewAlert({...newAlert, condition: value})}>
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="above">Goes above</SelectItem>
-                  <SelectItem value="below">Falls below</SelectItem>
-                </SelectContent>
-              </Select>
-              
-              <Input
-                type="number"
-                placeholder="Target price (KSh/kg)"
-                value={newAlert.targetPrice}
-                onChange={(e) => setNewAlert({...newAlert, targetPrice: e.target.value})}
-              />
-            </div>
-            
             <div className="flex space-x-2">
-              <Button onClick={handleAddAlert} className="bg-green-600 hover:bg-green-700">
-                Create Alert
+              <Button onClick={handleAddAlert} className="bg-green-600 hover:bg-green-700" disabled={isLoading}>
+                {isLoading ? 'Creating...' : 'Create Alert'}
               </Button>
               <Button onClick={() => setShowForm(false)} variant="outline">
                 Cancel
@@ -146,9 +210,13 @@ const PriceAlerts = () => {
           {alerts.map((alert) => (
             <div key={alert.id} className="flex items-center justify-between p-3 bg-white border rounded-lg">
               <div>
-                <p className="font-medium">{alert.crop} at {alert.market}</p>
+                <p className="font-medium">{alert.crop_name}</p>
                 <p className="text-sm text-gray-600">
-                  Alert when price goes {alert.condition} KSh {alert.targetPrice}/kg
+                  Alert when price reaches KSh {alert.target_price}/kg
+                  {alert.location && ` in ${alert.location}`}
+                </p>
+                <p className="text-xs text-gray-500">
+                  Created {new Date(alert.created_at).toLocaleDateString()}
                 </p>
               </div>
               <Button

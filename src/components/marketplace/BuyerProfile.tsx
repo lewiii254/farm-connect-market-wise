@@ -224,24 +224,42 @@ const BuyerProfile = () => {
     }
   };
 
-  // Safe SelectItem renderer with final validation
+  // Safe SelectItem renderer with triple validation
   const renderSelectItems = (items: string[], labelTransform?: (item: string) => string) => {
-    return items
-      .filter(item => item && typeof item === 'string' && item.trim().length > 0)
+    // First filter: ensure we only work with valid strings
+    const validItems = items.filter(item => 
+      item && 
+      typeof item === 'string' && 
+      item.trim().length > 0
+    );
+    
+    console.log('Valid items for SelectItems:', validItems);
+    
+    // Second filter: map to JSX and validate again
+    const selectItems = validItems
       .map((item) => {
-        // Final safety check - if this fails, log error but don't crash
+        // Triple safety check before creating SelectItem
         if (!item || typeof item !== 'string' || item.trim().length === 0) {
-          console.error('CRITICAL: Empty item reached SelectItem rendering:', item);
+          console.error('CRITICAL: Invalid item found during mapping:', item);
+          return null;
+        }
+        
+        const trimmedItem = item.trim();
+        if (trimmedItem.length === 0) {
+          console.error('CRITICAL: Empty item after trimming:', item);
           return null;
         }
         
         return (
-          <SelectItem key={item} value={item}>
-            {labelTransform ? labelTransform(item) : item}
+          <SelectItem key={trimmedItem} value={trimmedItem}>
+            {labelTransform ? labelTransform(trimmedItem) : trimmedItem}
           </SelectItem>
         );
       })
-      .filter(Boolean);
+      .filter(Boolean); // Remove any null items
+    
+    console.log('Final SelectItems count:', selectItems.length);
+    return selectItems;
   };
 
   if (isLoading) {

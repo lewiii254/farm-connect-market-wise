@@ -65,18 +65,26 @@ const RAW_AVAILABLE_CROPS = [
   'Spinach'
 ];
 
-// Apply strict filtering immediately
-const BUSINESS_TYPES = RAW_BUSINESS_TYPES.filter(type => 
-  type && typeof type === 'string' && type.trim().length > 0
-);
+// Apply ultra-strict filtering with multiple validation layers
+const isValidSelectValue = (value: any): value is string => {
+  return (
+    value !== null &&
+    value !== undefined &&
+    typeof value === 'string' &&
+    value.trim().length > 0 &&
+    value !== '' &&
+    !/^\s*$/.test(value) // No whitespace-only strings
+  );
+};
 
-const KENYAN_COUNTIES = RAW_KENYAN_COUNTIES.filter(county => 
-  county && typeof county === 'string' && county.trim().length > 0
-);
+const BUSINESS_TYPES = RAW_BUSINESS_TYPES.filter(isValidSelectValue);
+const KENYAN_COUNTIES = RAW_KENYAN_COUNTIES.filter(isValidSelectValue);
+const AVAILABLE_CROPS = RAW_AVAILABLE_CROPS.filter(isValidSelectValue);
 
-const AVAILABLE_CROPS = RAW_AVAILABLE_CROPS.filter(crop => 
-  crop && typeof crop === 'string' && crop.trim().length > 0
-);
+// Log the final arrays to ensure they're clean
+console.log('BUSINESS_TYPES after filtering:', BUSINESS_TYPES);
+console.log('KENYAN_COUNTIES after filtering:', KENYAN_COUNTIES);
+console.log('AVAILABLE_CROPS after filtering:', AVAILABLE_CROPS);
 
 const BuyerProfile = () => {
   const { user } = useAuth();
@@ -202,7 +210,7 @@ const BuyerProfile = () => {
   };
 
   const toggleCrop = (crop: string) => {
-    if (!crop || typeof crop !== 'string' || crop.trim().length === 0) {
+    if (!isValidSelectValue(crop)) {
       console.warn('Invalid crop value:', crop);
       return;
     }
@@ -226,7 +234,36 @@ const BuyerProfile = () => {
 
   // Helper function to get safe select value - never returns empty string
   const getSafeSelectValue = (value: string) => {
-    return value && value.trim().length > 0 ? value : undefined;
+    return isValidSelectValue(value) ? value : undefined;
+  };
+
+  // Safe SelectItem renderer with ultra-strict validation
+  const renderSafeSelectItems = (items: string[], labelTransform?: (item: string) => string) => {
+    console.log('Rendering SelectItems for items:', items);
+    
+    return items
+      .filter(item => {
+        const isValid = isValidSelectValue(item);
+        if (!isValid) {
+          console.error('FILTERED OUT invalid item for SelectItem:', item, typeof item);
+        }
+        return isValid;
+      })
+      .map((item) => {
+        // Final safety check before creating SelectItem
+        if (!isValidSelectValue(item)) {
+          console.error('CRITICAL: Invalid item passed SelectItem validation:', item);
+          return null;
+        }
+        
+        console.log('Creating SelectItem with value:', item);
+        return (
+          <SelectItem key={item} value={item}>
+            {labelTransform ? labelTransform(item) : item}
+          </SelectItem>
+        );
+      })
+      .filter(Boolean); // Remove any null items
   };
 
   if (isLoading) {
@@ -294,11 +331,7 @@ const BuyerProfile = () => {
                     <SelectValue placeholder="Select business type" />
                   </SelectTrigger>
                   <SelectContent>
-                    {BUSINESS_TYPES.map((type) => (
-                      <SelectItem key={type} value={type}>
-                        {type.charAt(0).toUpperCase() + type.slice(1)}
-                      </SelectItem>
-                    ))}
+                    {renderSafeSelectItems(BUSINESS_TYPES, (type) => type.charAt(0).toUpperCase() + type.slice(1))}
                   </SelectContent>
                 </Select>
               </div>
@@ -318,11 +351,7 @@ const BuyerProfile = () => {
                     <SelectValue placeholder="Select location" />
                   </SelectTrigger>
                   <SelectContent>
-                    {KENYAN_COUNTIES.map((county) => (
-                      <SelectItem key={county} value={county}>
-                        {county}
-                      </SelectItem>
-                    ))}
+                    {renderSafeSelectItems(KENYAN_COUNTIES)}
                   </SelectContent>
                 </Select>
               </div>
@@ -354,7 +383,7 @@ const BuyerProfile = () => {
             <div className="space-y-2">
               <Label>Preferred Crops</Label>
               <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
-                {AVAILABLE_CROPS.map((crop) => (
+                {AVAILABLE_CROPS.filter(isValidSelectValue).map((crop) => (
                   <div key={crop} className="flex items-center space-x-2">
                     <Button
                       type="button"
@@ -432,7 +461,7 @@ const BuyerProfile = () => {
           <div>
             <h4 className="font-medium text-gray-900 mb-2">Preferred Crops</h4>
             <div className="flex flex-wrap gap-2">
-              {profile.preferred_crops.filter(crop => AVAILABLE_CROPS.includes(crop)).map(crop => (
+              {profile.preferred_crops.filter(isValidSelectValue).map(crop => (
                 <Badge key={crop} variant="secondary">
                   {crop}
                 </Badge>

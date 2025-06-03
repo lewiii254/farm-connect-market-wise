@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -22,7 +21,7 @@ interface BuyerProfileData {
   preferred_crops: string[] | null;
 }
 
-// Define constants with proper validation - filter out any empty strings
+// Define constants with extremely strict validation
 const BUSINESS_TYPES = [
   'supermarket',
   'restaurant', 
@@ -32,7 +31,7 @@ const BUSINESS_TYPES = [
   'retailer',
   'hotel',
   'institution'
-].filter(type => type && type.trim() !== '' && type.length > 0);
+].filter(type => type && typeof type === 'string' && type.trim().length > 0);
 
 const KENYAN_COUNTIES = [
   'Nairobi',
@@ -49,7 +48,7 @@ const KENYAN_COUNTIES = [
   'Meru',
   'Nyeri',
   'Kericho'
-].filter(county => county && county.trim() !== '' && county.length > 0);
+].filter(county => county && typeof county === 'string' && county.trim().length > 0);
 
 const AVAILABLE_CROPS = [
   'Maize',
@@ -63,7 +62,7 @@ const AVAILABLE_CROPS = [
   'Onions',
   'Cabbage',
   'Spinach'
-].filter(crop => crop && crop.trim() !== '' && crop.length > 0);
+].filter(crop => crop && typeof crop === 'string' && crop.trim().length > 0);
 
 const BuyerProfile = () => {
   const { user } = useAuth();
@@ -72,8 +71,8 @@ const BuyerProfile = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState({
     company_name: '',
-    business_type: '' as string,
-    location: '' as string,
+    business_type: '',
+    location: '',
     phone_number: '',
     minimum_order_kg: '',
     preferred_crops: [] as string[],
@@ -84,14 +83,14 @@ const BuyerProfile = () => {
     console.log('KENYAN_COUNTIES:', KENYAN_COUNTIES);
     console.log('AVAILABLE_CROPS:', AVAILABLE_CROPS);
     
-    // Check for any empty strings in arrays
-    const emptyBusinessTypes = BUSINESS_TYPES.filter(type => !type || type.trim() === '');
-    const emptyCounties = KENYAN_COUNTIES.filter(county => !county || county.trim() === '');
-    const emptyCrops = AVAILABLE_CROPS.filter(crop => !crop || crop.trim() === '');
+    // Check for any invalid values in arrays
+    const invalidBusinessTypes = BUSINESS_TYPES.filter(type => !type || typeof type !== 'string' || type.trim().length === 0);
+    const invalidCounties = KENYAN_COUNTIES.filter(county => !county || typeof county !== 'string' || county.trim().length === 0);
+    const invalidCrops = AVAILABLE_CROPS.filter(crop => !crop || typeof crop !== 'string' || crop.trim().length === 0);
     
-    if (emptyBusinessTypes.length > 0) console.error('Empty business types found:', emptyBusinessTypes);
-    if (emptyCounties.length > 0) console.error('Empty counties found:', emptyCounties);
-    if (emptyCrops.length > 0) console.error('Empty crops found:', emptyCrops);
+    if (invalidBusinessTypes.length > 0) console.error('Invalid business types found:', invalidBusinessTypes);
+    if (invalidCounties.length > 0) console.error('Invalid counties found:', invalidCounties);
+    if (invalidCrops.length > 0) console.error('Invalid crops found:', invalidCrops);
   }, []);
 
   useEffect(() => {
@@ -204,7 +203,7 @@ const BuyerProfile = () => {
   };
 
   const toggleCrop = (crop: string) => {
-    if (!AVAILABLE_CROPS.includes(crop) || !isValidValue(crop)) {
+    if (!isValidValue(crop)) {
       console.warn('Invalid crop value:', crop);
       return;
     }
@@ -218,7 +217,7 @@ const BuyerProfile = () => {
   };
 
   const isValidValue = (value: string): boolean => {
-    return value && typeof value === 'string' && value.trim() !== '' && value.length > 0;
+    return value && typeof value === 'string' && value.trim().length > 0;
   };
 
   const getVerificationColor = (status: string) => {
@@ -230,24 +229,35 @@ const BuyerProfile = () => {
     }
   };
 
-  // Helper function to safely render SelectItems
+  // Ultra-safe helper function to render SelectItems with maximum validation
   const renderSelectItems = (items: string[], labelTransform?: (item: string) => string) => {
-    return items
-      .filter(item => isValidValue(item)) // Double check validation
-      .map((item) => {
-        // Triple check before rendering - absolutely no empty strings
-        if (!item || item.trim() === '' || item.length === 0) {
-          console.warn('Skipping invalid item:', item);
-          return null;
-        }
-        
-        return (
-          <SelectItem key={item} value={item}>
-            {labelTransform ? labelTransform(item) : item}
-          </SelectItem>
-        );
-      })
-      .filter(Boolean); // Remove any null items
+    console.log('renderSelectItems called with:', items);
+    
+    const validItems = items.filter(item => {
+      const isValid = item && typeof item === 'string' && item.trim().length > 0;
+      if (!isValid) {
+        console.warn('Filtering out invalid item:', item);
+      }
+      return isValid;
+    });
+
+    console.log('Valid items after filtering:', validItems);
+
+    return validItems.map((item) => {
+      // Final safety check before rendering
+      if (!item || typeof item !== 'string' || item.trim().length === 0) {
+        console.error('CRITICAL: Invalid item reached SelectItem rendering:', item);
+        return null;
+      }
+      
+      console.log('Rendering SelectItem with value:', item);
+      
+      return (
+        <SelectItem key={item} value={item}>
+          {labelTransform ? labelTransform(item) : item}
+        </SelectItem>
+      );
+    }).filter(Boolean);
   };
 
   if (isLoading) {
@@ -306,8 +316,10 @@ const BuyerProfile = () => {
                   value={formData.business_type || undefined} 
                   onValueChange={(value) => {
                     console.log('Business type selected:', value);
-                    if (BUSINESS_TYPES.includes(value) && isValidValue(value)) {
+                    if (value && typeof value === 'string' && value.trim().length > 0 && BUSINESS_TYPES.includes(value)) {
                       setFormData({...formData, business_type: value});
+                    } else {
+                      console.warn('Invalid business type selected:', value);
                     }
                   }}
                 >
@@ -326,8 +338,10 @@ const BuyerProfile = () => {
                   value={formData.location || undefined} 
                   onValueChange={(value) => {
                     console.log('Location selected:', value);
-                    if (KENYAN_COUNTIES.includes(value) && isValidValue(value)) {
+                    if (value && typeof value === 'string' && value.trim().length > 0 && KENYAN_COUNTIES.includes(value)) {
                       setFormData({...formData, location: value});
+                    } else {
+                      console.warn('Invalid location selected:', value);
                     }
                   }}
                 >

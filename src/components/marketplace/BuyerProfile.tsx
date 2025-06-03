@@ -224,42 +224,9 @@ const BuyerProfile = () => {
     }
   };
 
-  // Safe SelectItem renderer with triple validation
-  const renderSelectItems = (items: string[], labelTransform?: (item: string) => string) => {
-    // First filter: ensure we only work with valid strings
-    const validItems = items.filter(item => 
-      item && 
-      typeof item === 'string' && 
-      item.trim().length > 0
-    );
-    
-    console.log('Valid items for SelectItems:', validItems);
-    
-    // Second filter: map to JSX and validate again
-    const selectItems = validItems
-      .map((item) => {
-        // Triple safety check before creating SelectItem
-        if (!item || typeof item !== 'string' || item.trim().length === 0) {
-          console.error('CRITICAL: Invalid item found during mapping:', item);
-          return null;
-        }
-        
-        const trimmedItem = item.trim();
-        if (trimmedItem.length === 0) {
-          console.error('CRITICAL: Empty item after trimming:', item);
-          return null;
-        }
-        
-        return (
-          <SelectItem key={trimmedItem} value={trimmedItem}>
-            {labelTransform ? labelTransform(trimmedItem) : trimmedItem}
-          </SelectItem>
-        );
-      })
-      .filter(Boolean); // Remove any null items
-    
-    console.log('Final SelectItems count:', selectItems.length);
-    return selectItems;
+  // Helper function to get safe select value - never returns empty string
+  const getSafeSelectValue = (value: string) => {
+    return value && value.trim().length > 0 ? value : undefined;
   };
 
   if (isLoading) {
@@ -315,7 +282,7 @@ const BuyerProfile = () => {
               <div className="space-y-2">
                 <Label htmlFor="business_type">Business Type *</Label>
                 <Select 
-                  value={formData.business_type || undefined} 
+                  value={getSafeSelectValue(formData.business_type)} 
                   onValueChange={(value) => {
                     console.log('Business type selected:', value);
                     if (value && BUSINESS_TYPES.includes(value)) {
@@ -327,7 +294,11 @@ const BuyerProfile = () => {
                     <SelectValue placeholder="Select business type" />
                   </SelectTrigger>
                   <SelectContent>
-                    {renderSelectItems(BUSINESS_TYPES, (type) => type.charAt(0).toUpperCase() + type.slice(1))}
+                    {BUSINESS_TYPES.map((type) => (
+                      <SelectItem key={type} value={type}>
+                        {type.charAt(0).toUpperCase() + type.slice(1)}
+                      </SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
               </div>
@@ -335,7 +306,7 @@ const BuyerProfile = () => {
               <div className="space-y-2">
                 <Label htmlFor="location">Location *</Label>
                 <Select 
-                  value={formData.location || undefined} 
+                  value={getSafeSelectValue(formData.location)} 
                   onValueChange={(value) => {
                     console.log('Location selected:', value);
                     if (value && KENYAN_COUNTIES.includes(value)) {
@@ -347,7 +318,11 @@ const BuyerProfile = () => {
                     <SelectValue placeholder="Select location" />
                   </SelectTrigger>
                   <SelectContent>
-                    {renderSelectItems(KENYAN_COUNTIES)}
+                    {KENYAN_COUNTIES.map((county) => (
+                      <SelectItem key={county} value={county}>
+                        {county}
+                      </SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
               </div>

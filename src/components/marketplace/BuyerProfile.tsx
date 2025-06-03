@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -36,7 +35,7 @@ const BuyerProfile = () => {
     preferred_crops: [] as string[],
   });
 
-  // Ensure all arrays contain only non-empty strings
+  // Ensure all arrays contain only valid non-empty strings
   const businessTypes = [
     'supermarket',
     'restaurant',
@@ -46,17 +45,17 @@ const BuyerProfile = () => {
     'retailer',
     'hotel',
     'institution'
-  ].filter(type => type && type.trim() !== '');
+  ].filter(type => type && typeof type === 'string' && type.trim().length > 0);
 
   const crops = [
     'Maize', 'Beans', 'Potatoes', 'Tomatoes', 'Kales (Sukuma Wiki)', 
     'Avocados', 'Bananas', 'Carrots', 'Onions', 'Cabbage', 'Spinach'
-  ].filter(crop => crop && crop.trim() !== '');
+  ].filter(crop => crop && typeof crop === 'string' && crop.trim().length > 0);
 
   const kenyanCounties = [
     'Nairobi', 'Mombasa', 'Nakuru', 'Eldoret', 'Kisumu', 'Thika', 'Malindi',
     'Kitale', 'Garissa', 'Kakamega', 'Machakos', 'Meru', 'Nyeri', 'Kericho'
-  ].filter(county => county && county.trim() !== '');
+  ].filter(county => county && typeof county === 'string' && county.trim().length > 0);
 
   useEffect(() => {
     if (user) {
@@ -245,11 +244,15 @@ const BuyerProfile = () => {
                     <SelectValue placeholder="Select business type" />
                   </SelectTrigger>
                   <SelectContent>
-                    {businessTypes.map(type => (
-                      <SelectItem key={type} value={type}>
-                        {type.charAt(0).toUpperCase() + type.slice(1)}
-                      </SelectItem>
-                    ))}
+                    {businessTypes.map(type => {
+                      // Additional safety check to ensure no empty values
+                      if (!type || type.trim().length === 0) return null;
+                      return (
+                        <SelectItem key={type} value={type}>
+                          {type.charAt(0).toUpperCase() + type.slice(1)}
+                        </SelectItem>
+                      );
+                    })}
                   </SelectContent>
                 </Select>
               </div>
@@ -264,9 +267,13 @@ const BuyerProfile = () => {
                     <SelectValue placeholder="Select location" />
                   </SelectTrigger>
                   <SelectContent>
-                    {kenyanCounties.map(county => (
-                      <SelectItem key={county} value={county}>{county}</SelectItem>
-                    ))}
+                    {kenyanCounties.map(county => {
+                      // Additional safety check to ensure no empty values
+                      if (!county || county.trim().length === 0) return null;
+                      return (
+                        <SelectItem key={county} value={county}>{county}</SelectItem>
+                      );
+                    })}
                   </SelectContent>
                 </Select>
               </div>
@@ -298,19 +305,23 @@ const BuyerProfile = () => {
             <div className="space-y-2">
               <Label>Preferred Crops</Label>
               <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
-                {crops.map(crop => (
-                  <div key={crop} className="flex items-center space-x-2">
-                    <Button
-                      type="button"
-                      variant={formData.preferred_crops.includes(crop) ? "default" : "outline"}
-                      size="sm"
-                      onClick={() => toggleCrop(crop)}
-                      className={formData.preferred_crops.includes(crop) ? "bg-green-600 hover:bg-green-700" : ""}
-                    >
-                      {crop}
-                    </Button>
-                  </div>
-                ))}
+                {crops.map(crop => {
+                  // Additional safety check
+                  if (!crop || crop.trim().length === 0) return null;
+                  return (
+                    <div key={crop} className="flex items-center space-x-2">
+                      <Button
+                        type="button"
+                        variant={formData.preferred_crops.includes(crop) ? "default" : "outline"}
+                        size="sm"
+                        onClick={() => toggleCrop(crop)}
+                        className={formData.preferred_crops.includes(crop) ? "bg-green-600 hover:bg-green-700" : ""}
+                      >
+                        {crop}
+                      </Button>
+                    </div>
+                  );
+                })}
               </div>
             </div>
 

@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -21,20 +22,20 @@ interface BuyerProfileData {
   preferred_crops: string[] | null;
 }
 
-// Helper function to validate and filter values
+// Helper function to validate values for SelectItem
 const isValidSelectValue = (value: any): value is string => {
-  return typeof value === 'string' && value.trim().length > 0 && value !== '';
+  return typeof value === 'string' && value.trim().length > 0;
 };
 
-// Helper function to get safe select value (converts empty strings to undefined)
+// Helper function to get safe select value
 const getSafeSelectValue = (value: string | undefined | null): string | undefined => {
-  if (!value || value.trim() === '') {
+  if (!value || typeof value !== 'string' || value.trim() === '') {
     return undefined;
   }
-  return value;
+  return value.trim();
 };
 
-// Define constants with ultra-strict validation
+// Define constants with strict validation - ensuring no empty strings
 const BUSINESS_TYPES = [
   'supermarket',
   'restaurant', 
@@ -44,7 +45,7 @@ const BUSINESS_TYPES = [
   'retailer',
   'hotel',
   'institution'
-].filter(isValidSelectValue);
+].filter(type => isValidSelectValue(type));
 
 const KENYAN_COUNTIES = [
   'Nairobi',
@@ -61,7 +62,7 @@ const KENYAN_COUNTIES = [
   'Meru',
   'Nyeri',
   'Kericho'
-].filter(isValidSelectValue);
+].filter(county => isValidSelectValue(county));
 
 const AVAILABLE_CROPS = [
   'Maize',
@@ -75,12 +76,12 @@ const AVAILABLE_CROPS = [
   'Onions',
   'Cabbage',
   'Spinach'
-].filter(isValidSelectValue);
+].filter(crop => isValidSelectValue(crop));
 
-// Add console logging to debug
-console.log('BUSINESS_TYPES:', BUSINESS_TYPES);
-console.log('KENYAN_COUNTIES:', KENYAN_COUNTIES);
-console.log('AVAILABLE_CROPS:', AVAILABLE_CROPS);
+// Extra validation to log and double-check our constants
+console.log('Validated BUSINESS_TYPES:', BUSINESS_TYPES);
+console.log('Validated KENYAN_COUNTIES:', KENYAN_COUNTIES);
+console.log('Validated AVAILABLE_CROPS:', AVAILABLE_CROPS);
 
 const BuyerProfile = () => {
   const { user } = useAuth();
@@ -230,6 +231,38 @@ const BuyerProfile = () => {
     }
   };
 
+  // Render business type select options with extra validation
+  const renderBusinessTypeOptions = () => {
+    console.log('Rendering business type options:', BUSINESS_TYPES);
+    return BUSINESS_TYPES.map((type) => {
+      if (!isValidSelectValue(type)) {
+        console.error('Invalid business type detected:', type);
+        return null;
+      }
+      return (
+        <SelectItem key={`business-${type}`} value={type}>
+          {type.charAt(0).toUpperCase() + type.slice(1)}
+        </SelectItem>
+      );
+    }).filter(Boolean);
+  };
+
+  // Render location select options with extra validation
+  const renderLocationOptions = () => {
+    console.log('Rendering location options:', KENYAN_COUNTIES);
+    return KENYAN_COUNTIES.map((county) => {
+      if (!isValidSelectValue(county)) {
+        console.error('Invalid county detected:', county);
+        return null;
+      }
+      return (
+        <SelectItem key={`county-${county}`} value={county}>
+          {county}
+        </SelectItem>
+      );
+    }).filter(Boolean);
+  };
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -286,18 +319,16 @@ const BuyerProfile = () => {
                   value={getSafeSelectValue(formData.business_type)} 
                   onValueChange={(value) => {
                     console.log('Business type selected:', value);
-                    setFormData({...formData, business_type: value || ''});
+                    if (isValidSelectValue(value)) {
+                      setFormData({...formData, business_type: value});
+                    }
                   }}
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="Select business type" />
                   </SelectTrigger>
                   <SelectContent>
-                    {BUSINESS_TYPES.map((type) => (
-                      <SelectItem key={`business-${type}`} value={type}>
-                        {type.charAt(0).toUpperCase() + type.slice(1)}
-                      </SelectItem>
-                    ))}
+                    {renderBusinessTypeOptions()}
                   </SelectContent>
                 </Select>
               </div>
@@ -308,18 +339,16 @@ const BuyerProfile = () => {
                   value={getSafeSelectValue(formData.location)} 
                   onValueChange={(value) => {
                     console.log('Location selected:', value);
-                    setFormData({...formData, location: value || ''});
+                    if (isValidSelectValue(value)) {
+                      setFormData({...formData, location: value});
+                    }
                   }}
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="Select location" />
                   </SelectTrigger>
                   <SelectContent>
-                    {KENYAN_COUNTIES.map((county) => (
-                      <SelectItem key={`county-${county}`} value={county}>
-                        {county}
-                      </SelectItem>
-                    ))}
+                    {renderLocationOptions()}
                   </SelectContent>
                 </Select>
               </div>
@@ -351,19 +380,25 @@ const BuyerProfile = () => {
             <div className="space-y-2">
               <Label>Preferred Crops</Label>
               <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
-                {AVAILABLE_CROPS.map((crop) => (
-                  <div key={`crop-${crop}`} className="flex items-center space-x-2">
-                    <Button
-                      type="button"
-                      variant={formData.preferred_crops.includes(crop) ? "default" : "outline"}
-                      size="sm"
-                      onClick={() => toggleCrop(crop)}
-                      className={formData.preferred_crops.includes(crop) ? "bg-green-600 hover:bg-green-700" : ""}
-                    >
-                      {crop}
-                    </Button>
-                  </div>
-                ))}
+                {AVAILABLE_CROPS.map((crop) => {
+                  if (!isValidSelectValue(crop)) {
+                    console.error('Invalid crop detected:', crop);
+                    return null;
+                  }
+                  return (
+                    <div key={`crop-${crop}`} className="flex items-center space-x-2">
+                      <Button
+                        type="button"
+                        variant={formData.preferred_crops.includes(crop) ? "default" : "outline"}
+                        size="sm"
+                        onClick={() => toggleCrop(crop)}
+                        className={formData.preferred_crops.includes(crop) ? "bg-green-600 hover:bg-green-700" : ""}
+                      >
+                        {crop}
+                      </Button>
+                    </div>
+                  );
+                }).filter(Boolean)}
               </div>
             </div>
 

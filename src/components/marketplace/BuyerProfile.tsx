@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -45,17 +44,17 @@ const BuyerProfile = () => {
     'retailer',
     'hotel',
     'institution'
-  ];
+  ].filter(type => type && type.trim() !== ''); // Filter out any empty values
 
   const crops = [
     'Maize', 'Beans', 'Potatoes', 'Tomatoes', 'Kales (Sukuma Wiki)', 
     'Avocados', 'Bananas', 'Carrots', 'Onions', 'Cabbage', 'Spinach'
-  ];
+  ].filter(crop => crop && crop.trim() !== ''); // Filter out any empty values
 
   const kenyanCounties = [
     'Nairobi', 'Mombasa', 'Nakuru', 'Eldoret', 'Kisumu', 'Thika', 'Malindi',
     'Kitale', 'Garissa', 'Kakamega', 'Machakos', 'Meru', 'Nyeri', 'Kericho'
-  ];
+  ].filter(county => county && county.trim() !== ''); // Filter out any empty values
 
   useEffect(() => {
     if (user) {

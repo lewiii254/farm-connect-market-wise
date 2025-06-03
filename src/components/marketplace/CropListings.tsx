@@ -1,46 +1,74 @@
 
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { MapPin, Calendar, Leaf, Phone, MessageCircle } from 'lucide-react';
-import { useAuth } from '@/hooks/useAuth';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { MapPin, Calendar, Package, Leaf } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
 
 interface CropListing {
   id: string;
   crop_name: string;
-  quantity_kg: number;
   price_per_kg: number;
-  description: string | null;
+  quantity_kg: number;
   location: string;
   harvest_date: string | null;
+  available_from: string;
   available_until: string | null;
   is_organic: boolean;
   is_available: boolean;
-  created_at: string;
+  description: string | null;
   farmer_id: string;
 }
 
-const CropListings = () => {
-  const { user } = useAuth();
+const AVAILABLE_CROPS = [
+  'Maize',
+  'Beans',
+  'Potatoes',
+  'Tomatoes',
+  'Kales (Sukuma Wiki)',
+  'Avocados',
+  'Bananas',
+  'Carrots',
+  'Onions',
+  'Cabbage',
+  'Spinach'
+];
+
+const KENYAN_COUNTIES = [
+  'Nairobi',
+  'Mombasa',
+  'Nakuru',
+  'Eldoret',
+  'Kisumu',
+  'Thika',
+  'Malindi',
+  'Kitale',
+  'Garissa',
+  'Kakamega',
+  'Machakos',
+  'Meru',
+  'Nyeri',
+  'Kericho'
+];
+
+const CropListings = ({ key }: { key?: number }) => {
   const [listings, setListings] = useState<CropListing[]>([]);
-  const [filteredListings, setFilteredListings] = useState<CropListing[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [locationFilter, setLocationFilter] = useState('');
-  const [cropFilter, setCropFilter] = useState('');
+  const [filters, setFilters] = useState({
+    crop: '',
+    location: '',
+    maxPrice: '',
+    organicOnly: false,
+  });
 
   useEffect(() => {
     fetchListings();
-  }, []);
-
-  useEffect(() => {
-    filterListings();
-  }, [listings, searchTerm, locationFilter, cropFilter]);
+  }, [key]);
 
   const fetchListings = async () => {
     try {
@@ -53,7 +81,7 @@ const CropListings = () => {
       if (error) throw error;
       setListings(data || []);
     } catch (error: any) {
-      console.error('Error fetching listings:', error);
+      console.error('Error fetching crop listings:', error);
       toast({
         title: "Error",
         description: "Failed to load crop listings",
@@ -64,41 +92,22 @@ const CropListings = () => {
     }
   };
 
-  const filterListings = () => {
-    let filtered = listings;
+  const filteredListings = listings.filter(listing => {
+    if (filters.crop && listing.crop_name !== filters.crop) return false;
+    if (filters.location && listing.location !== filters.location) return false;
+    if (filters.maxPrice && listing.price_per_kg > parseFloat(filters.maxPrice)) return false;
+    if (filters.organicOnly && !listing.is_organic) return false;
+    return true;
+  });
 
-    if (searchTerm) {
-      filtered = filtered.filter(listing =>
-        listing.crop_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        listing.description?.toLowerCase().includes(searchTerm.toLowerCase())
-      );
-    }
-
-    if (locationFilter) {
-      filtered = filtered.filter(listing => listing.location === locationFilter);
-    }
-
-    if (cropFilter) {
-      filtered = filtered.filter(listing => listing.crop_name === cropFilter);
-    }
-
-    setFilteredListings(filtered);
-  };
-
-  const handleContactFarmer = (listing: CropListing) => {
-    toast({
-      title: "Contact Feature",
-      description: "Direct messaging feature will be available soon!",
+  const resetFilters = () => {
+    setFilters({
+      crop: '',
+      location: '',
+      maxPrice: '',
+      organicOnly: false,
     });
   };
-
-  const formatDate = (dateString: string | null) => {
-    if (!dateString) return 'Not specified';
-    return new Date(dateString).toLocaleDateString();
-  };
-
-  const uniqueLocations = [...new Set(listings.map(l => l.location))];
-  const uniqueCrops = [...new Set(listings.map(l => l.crop_name))];
 
   if (isLoading) {
     return (
@@ -110,151 +119,147 @@ const CropListings = () => {
 
   return (
     <div className="space-y-6">
-      {/* Filters */}
       <Card>
         <CardHeader>
-          <CardTitle>Find Crops</CardTitle>
-          <CardDescription>Search and filter available crop listings</CardDescription>
+          <CardTitle>Filter Crops</CardTitle>
+          <CardDescription>
+            Find the crops you're looking for
+          </CardDescription>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <Input
-              placeholder="Search crops..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
-            
-            <Select value={cropFilter} onValueChange={setCropFilter}>
-              <SelectTrigger>
-                <SelectValue placeholder="All crops" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="">All crops</SelectItem>
-                {uniqueCrops.map(crop => (
-                  <SelectItem key={crop} value={crop}>{crop}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <div className="space-y-2">
+              <Label>Crop Type</Label>
+              <Select 
+                value={filters.crop || undefined} 
+                onValueChange={(value) => setFilters({...filters, crop: value || ''})}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Any crop" />
+                </SelectTrigger>
+                <SelectContent>
+                  {AVAILABLE_CROPS.map((crop) => (
+                    <SelectItem key={crop} value={crop}>
+                      {crop}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
 
-            <Select value={locationFilter} onValueChange={setLocationFilter}>
-              <SelectTrigger>
-                <SelectValue placeholder="All locations" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="">All locations</SelectItem>
-                {uniqueLocations.map(location => (
-                  <SelectItem key={location} value={location}>{location}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <div className="space-y-2">
+              <Label>Location</Label>
+              <Select 
+                value={filters.location || undefined} 
+                onValueChange={(value) => setFilters({...filters, location: value || ''})}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Any location" />
+                </SelectTrigger>
+                <SelectContent>
+                  {KENYAN_COUNTIES.map((county) => (
+                    <SelectItem key={county} value={county}>
+                      {county}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
 
-            <Button
-              variant="outline"
-              onClick={() => {
-                setSearchTerm('');
-                setLocationFilter('');
-                setCropFilter('');
-              }}
-            >
-              Clear Filters
-            </Button>
+            <div className="space-y-2">
+              <Label>Max Price (KSh/kg)</Label>
+              <Input
+                type="number"
+                placeholder="Any price"
+                value={filters.maxPrice}
+                onChange={(e) => setFilters({...filters, maxPrice: e.target.value})}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label>Options</Label>
+              <Button 
+                variant="outline" 
+                onClick={resetFilters}
+                className="w-full"
+              >
+                Clear Filters
+              </Button>
+            </div>
           </div>
         </CardContent>
       </Card>
 
-      {/* Listings Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {filteredListings.map((listing) => (
-          <Card key={listing.id} className="hover-scale">
-            <CardHeader>
-              <div className="flex items-start justify-between">
-                <div>
-                  <CardTitle className="text-xl text-green-700">{listing.crop_name}</CardTitle>
-                  <div className="flex items-center mt-1 text-gray-600">
-                    <MapPin className="h-4 w-4 mr-1" />
-                    <span className="text-sm">{listing.location}</span>
+        {filteredListings.length === 0 ? (
+          <div className="col-span-full text-center py-12">
+            <Package className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+            <h3 className="text-lg font-medium text-gray-900 mb-2">No crops found</h3>
+            <p className="text-gray-500">
+              {listings.length === 0 ? 'No crops are currently listed.' : 'Try adjusting your filters.'}
+            </p>
+          </div>
+        ) : (
+          filteredListings.map((listing) => (
+            <Card key={listing.id} className="hover:shadow-lg transition-shadow">
+              <CardHeader>
+                <div className="flex items-start justify-between">
+                  <div>
+                    <CardTitle className="text-lg">{listing.crop_name}</CardTitle>
+                    <CardDescription className="flex items-center space-x-1 mt-1">
+                      <MapPin className="h-4 w-4" />
+                      <span>{listing.location}</span>
+                    </CardDescription>
+                  </div>
+                  <div className="flex flex-col items-end space-y-1">
+                    <div className="text-2xl font-bold text-green-600">
+                      KSh {listing.price_per_kg}
+                      <span className="text-sm text-gray-500 font-normal">/kg</span>
+                    </div>
+                    {listing.is_organic && (
+                      <Badge variant="secondary" className="bg-green-100 text-green-800">
+                        <Leaf className="h-3 w-3 mr-1" />
+                        Organic
+                      </Badge>
+                    )}
                   </div>
                 </div>
-                <div className="flex flex-col items-end space-y-1">
-                  {listing.is_organic && (
-                    <Badge variant="secondary" className="bg-green-100 text-green-800">
-                      <Leaf className="h-3 w-3 mr-1" />
-                      Organic
-                    </Badge>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="flex items-center justify-between text-sm text-gray-600">
+                  <div className="flex items-center space-x-1">
+                    <Package className="h-4 w-4" />
+                    <span>{listing.quantity_kg} kg available</span>
+                  </div>
+                  {listing.harvest_date && (
+                    <div className="flex items-center space-x-1">
+                      <Calendar className="h-4 w-4" />
+                      <span>Harvested {new Date(listing.harvest_date).toLocaleDateString()}</span>
+                    </div>
                   )}
                 </div>
-              </div>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <p className="text-sm text-gray-600">Quantity</p>
-                  <p className="font-semibold">{listing.quantity_kg} kg</p>
-                </div>
-                <div>
-                  <p className="text-sm text-gray-600">Price</p>
-                  <p className="font-semibold text-green-600">KSh {listing.price_per_kg}/kg</p>
-                </div>
-              </div>
 
-              <div>
-                <p className="text-sm text-gray-600">Total Value</p>
-                <p className="font-bold text-lg text-green-700">
-                  KSh {(listing.quantity_kg * listing.price_per_kg).toLocaleString()}
-                </p>
-              </div>
-
-              {listing.description && (
-                <div>
-                  <p className="text-sm text-gray-600">Description</p>
-                  <p className="text-sm mt-1">{listing.description}</p>
-                </div>
-              )}
-
-              <div className="grid grid-cols-2 gap-2 text-xs text-gray-500">
-                {listing.harvest_date && (
-                  <div className="flex items-center">
-                    <Calendar className="h-3 w-3 mr-1" />
-                    <span>Harvested: {formatDate(listing.harvest_date)}</span>
-                  </div>
+                {listing.description && (
+                  <p className="text-sm text-gray-600 line-clamp-2">
+                    {listing.description}
+                  </p>
                 )}
-                {listing.available_until && (
-                  <div className="flex items-center">
-                    <Calendar className="h-3 w-3 mr-1" />
-                    <span>Until: {formatDate(listing.available_until)}</span>
-                  </div>
-                )}
-              </div>
 
-              <div className="flex space-x-2 pt-2">
-                <Button
-                  onClick={() => handleContactFarmer(listing)}
-                  className="flex-1 bg-green-600 hover:bg-green-700"
-                  size="sm"
-                >
-                  <MessageCircle className="h-4 w-4 mr-2" />
+                <div className="text-xs text-gray-500">
+                  Available: {new Date(listing.available_from).toLocaleDateString()}
+                  {listing.available_until && (
+                    <span> - {new Date(listing.available_until).toLocaleDateString()}</span>
+                  )}
+                </div>
+
+                <Button className="w-full bg-green-600 hover:bg-green-700">
                   Contact Farmer
                 </Button>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
+              </CardContent>
+            </Card>
+          ))
+        )}
       </div>
-
-      {filteredListings.length === 0 && (
-        <Card>
-          <CardContent className="text-center py-12">
-            <p className="text-gray-500 mb-4">No crop listings found matching your criteria.</p>
-            <Button variant="outline" onClick={() => {
-              setSearchTerm('');
-              setLocationFilter('');
-              setCropFilter('');
-            }}>
-              Clear Filters
-            </Button>
-          </CardContent>
-        </Card>
-      )}
     </div>
   );
 };

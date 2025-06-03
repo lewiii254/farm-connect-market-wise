@@ -72,8 +72,8 @@ const BuyerProfile = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState({
     company_name: '',
-    business_type: undefined as string | undefined,
-    location: undefined as string | undefined,
+    business_type: '' as string,
+    location: '' as string,
     phone_number: '',
     minimum_order_kg: '',
     preferred_crops: [] as string[],
@@ -103,8 +103,8 @@ const BuyerProfile = () => {
         setProfile(data);
         setFormData({
           company_name: data.company_name || '',
-          business_type: data.business_type && BUSINESS_TYPES.includes(data.business_type) ? data.business_type : undefined,
-          location: data.location && KENYAN_COUNTIES.includes(data.location) ? data.location : undefined,
+          business_type: data.business_type && BUSINESS_TYPES.includes(data.business_type) ? data.business_type : '',
+          location: data.location && KENYAN_COUNTIES.includes(data.location) ? data.location : '',
           phone_number: data.phone_number || '',
           minimum_order_kg: data.minimum_order_kg?.toString() || '',
           preferred_crops: Array.isArray(data.preferred_crops) ? data.preferred_crops.filter(crop => AVAILABLE_CROPS.includes(crop)) : [],
@@ -264,7 +264,7 @@ const BuyerProfile = () => {
               <div className="space-y-2">
                 <Label htmlFor="business_type">Business Type *</Label>
                 <Select 
-                  value={formData.business_type || ''} 
+                  value={formData.business_type || undefined} 
                   onValueChange={(value) => {
                     if (BUSINESS_TYPES.includes(value)) {
                       setFormData({...formData, business_type: value});
@@ -287,7 +287,7 @@ const BuyerProfile = () => {
               <div className="space-y-2">
                 <Label htmlFor="location">Location *</Label>
                 <Select 
-                  value={formData.location || ''} 
+                  value={formData.location || undefined} 
                   onValueChange={(value) => {
                     if (KENYAN_COUNTIES.includes(value)) {
                       setFormData({...formData, location: value});

@@ -57,6 +57,11 @@ const BuyerProfile = () => {
     'Kitale', 'Garissa', 'Kakamega', 'Machakos', 'Meru', 'Nyeri', 'Kericho'
   ].filter(county => county && typeof county === 'string' && county.trim().length > 0);
 
+  // Helper function to safely get select value
+  const getSafeSelectValue = (value: string) => {
+    return value && value.trim().length > 0 ? value : undefined;
+  };
+
   useEffect(() => {
     if (user) {
       fetchBuyerProfile();
@@ -237,16 +242,18 @@ const BuyerProfile = () => {
               <div className="space-y-2">
                 <Label htmlFor="business_type">Business Type *</Label>
                 <Select 
-                  value={formData.business_type || undefined} 
-                  onValueChange={(value) => setFormData({...formData, business_type: value})}
+                  value={getSafeSelectValue(formData.business_type)} 
+                  onValueChange={(value) => setFormData({...formData, business_type: value || ''})}
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="Select business type" />
                   </SelectTrigger>
                   <SelectContent>
                     {businessTypes.map(type => {
-                      // Additional safety check to ensure no empty values
-                      if (!type || type.trim().length === 0) return null;
+                      // Skip any invalid values
+                      if (!type || typeof type !== 'string' || type.trim().length === 0) {
+                        return null;
+                      }
                       return (
                         <SelectItem key={type} value={type}>
                           {type.charAt(0).toUpperCase() + type.slice(1)}
@@ -260,16 +267,18 @@ const BuyerProfile = () => {
               <div className="space-y-2">
                 <Label htmlFor="location">Location *</Label>
                 <Select 
-                  value={formData.location || undefined} 
-                  onValueChange={(value) => setFormData({...formData, location: value})}
+                  value={getSafeSelectValue(formData.location)} 
+                  onValueChange={(value) => setFormData({...formData, location: value || ''})}
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="Select location" />
                   </SelectTrigger>
                   <SelectContent>
                     {kenyanCounties.map(county => {
-                      // Additional safety check to ensure no empty values
-                      if (!county || county.trim().length === 0) return null;
+                      // Skip any invalid values
+                      if (!county || typeof county !== 'string' || county.trim().length === 0) {
+                        return null;
+                      }
                       return (
                         <SelectItem key={county} value={county}>{county}</SelectItem>
                       );
@@ -306,8 +315,10 @@ const BuyerProfile = () => {
               <Label>Preferred Crops</Label>
               <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
                 {crops.map(crop => {
-                  // Additional safety check
-                  if (!crop || crop.trim().length === 0) return null;
+                  // Skip any invalid values
+                  if (!crop || typeof crop !== 'string' || crop.trim().length === 0) {
+                    return null;
+                  }
                   return (
                     <div key={crop} className="flex items-center space-x-2">
                       <Button

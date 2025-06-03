@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -35,6 +36,7 @@ const BuyerProfile = () => {
     preferred_crops: [] as string[],
   });
 
+  // Ensure all arrays contain only non-empty strings
   const businessTypes = [
     'supermarket',
     'restaurant',
@@ -44,17 +46,17 @@ const BuyerProfile = () => {
     'retailer',
     'hotel',
     'institution'
-  ].filter(type => type && type.trim() !== ''); // Filter out any empty values
+  ].filter(type => type && type.trim() !== '');
 
   const crops = [
     'Maize', 'Beans', 'Potatoes', 'Tomatoes', 'Kales (Sukuma Wiki)', 
     'Avocados', 'Bananas', 'Carrots', 'Onions', 'Cabbage', 'Spinach'
-  ].filter(crop => crop && crop.trim() !== ''); // Filter out any empty values
+  ].filter(crop => crop && crop.trim() !== '');
 
   const kenyanCounties = [
     'Nairobi', 'Mombasa', 'Nakuru', 'Eldoret', 'Kisumu', 'Thika', 'Malindi',
     'Kitale', 'Garissa', 'Kakamega', 'Machakos', 'Meru', 'Nyeri', 'Kericho'
-  ].filter(county => county && county.trim() !== ''); // Filter out any empty values
+  ].filter(county => county && county.trim() !== '');
 
   useEffect(() => {
     if (user) {
@@ -79,10 +81,10 @@ const BuyerProfile = () => {
       if (data) {
         setProfile(data);
         setFormData({
-          company_name: data.company_name,
-          business_type: data.business_type,
-          location: data.location,
-          phone_number: data.phone_number,
+          company_name: data.company_name || '',
+          business_type: data.business_type || '',
+          location: data.location || '',
+          phone_number: data.phone_number || '',
           minimum_order_kg: data.minimum_order_kg?.toString() || '',
           preferred_crops: data.preferred_crops || [],
         });
@@ -235,7 +237,10 @@ const BuyerProfile = () => {
 
               <div className="space-y-2">
                 <Label htmlFor="business_type">Business Type *</Label>
-                <Select value={formData.business_type} onValueChange={(value) => setFormData({...formData, business_type: value})}>
+                <Select 
+                  value={formData.business_type || undefined} 
+                  onValueChange={(value) => setFormData({...formData, business_type: value})}
+                >
                   <SelectTrigger>
                     <SelectValue placeholder="Select business type" />
                   </SelectTrigger>
@@ -251,7 +256,10 @@ const BuyerProfile = () => {
 
               <div className="space-y-2">
                 <Label htmlFor="location">Location *</Label>
-                <Select value={formData.location} onValueChange={(value) => setFormData({...formData, location: value})}>
+                <Select 
+                  value={formData.location || undefined} 
+                  onValueChange={(value) => setFormData({...formData, location: value})}
+                >
                   <SelectTrigger>
                     <SelectValue placeholder="Select location" />
                   </SelectTrigger>

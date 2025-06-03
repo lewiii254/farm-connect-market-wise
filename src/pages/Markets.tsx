@@ -80,8 +80,9 @@ const Markets = () => {
   };
 
   const getRandomChange = () => {
-    const change = (Math.random() * 20 - 10).toFixed(1);
-    return `${change >= 0 ? '+' : ''}${change}%`;
+    const changeNum = Math.random() * 20 - 10;
+    const change = changeNum.toFixed(1);
+    return `${changeNum >= 0 ? '+' : ''}${change}%`;
   };
 
   // Group latest prices by crop

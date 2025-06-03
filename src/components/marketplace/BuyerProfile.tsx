@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -21,17 +22,22 @@ interface BuyerProfileData {
   preferred_crops: string[] | null;
 }
 
-// Define constants with explicit validation
+// Helper function to validate and filter values
+const isValidSelectValue = (value: any): value is string => {
+  return typeof value === 'string' && value.trim().length > 0 && value !== '';
+};
+
+// Define constants with ultra-strict validation
 const BUSINESS_TYPES = [
   'supermarket',
-  'restaurant',
+  'restaurant', 
   'wholesaler',
   'export',
   'processor',
   'retailer',
   'hotel',
   'institution'
-].filter(type => type && type.trim().length > 0);
+].filter(isValidSelectValue);
 
 const KENYAN_COUNTIES = [
   'Nairobi',
@@ -48,7 +54,7 @@ const KENYAN_COUNTIES = [
   'Meru',
   'Nyeri',
   'Kericho'
-].filter(county => county && county.trim().length > 0);
+].filter(isValidSelectValue);
 
 const AVAILABLE_CROPS = [
   'Maize',
@@ -62,12 +68,12 @@ const AVAILABLE_CROPS = [
   'Onions',
   'Cabbage',
   'Spinach'
-].filter(crop => crop && crop.trim().length > 0);
+].filter(isValidSelectValue);
 
-// Helper function to validate select values
-const isValidSelectValue = (value: any): value is string => {
-  return typeof value === 'string' && value.trim().length > 0;
-};
+// Add console logging to debug
+console.log('BUSINESS_TYPES:', BUSINESS_TYPES);
+console.log('KENYAN_COUNTIES:', KENYAN_COUNTIES);
+console.log('AVAILABLE_CROPS:', AVAILABLE_CROPS);
 
 const BuyerProfile = () => {
   const { user } = useAuth();
@@ -107,11 +113,11 @@ const BuyerProfile = () => {
         setProfile(data);
         setFormData({
           company_name: data.company_name || '',
-          business_type: data.business_type || '',
-          location: data.location || '',
+          business_type: isValidSelectValue(data.business_type) ? data.business_type : '',
+          location: isValidSelectValue(data.location) ? data.location : '',
           phone_number: data.phone_number || '',
           minimum_order_kg: data.minimum_order_kg?.toString() || '',
-          preferred_crops: data.preferred_crops?.filter(isValidSelectValue) || [],
+          preferred_crops: Array.isArray(data.preferred_crops) ? data.preferred_crops.filter(isValidSelectValue) : [],
         });
       } else {
         setIsEditing(true);
@@ -133,7 +139,7 @@ const BuyerProfile = () => {
     
     if (!user) return;
 
-    if (!formData.company_name || !formData.business_type || !formData.location || !formData.phone_number) {
+    if (!formData.company_name || !isValidSelectValue(formData.business_type) || !isValidSelectValue(formData.location) || !formData.phone_number) {
       toast({
         title: "Missing Information",
         description: "Please fill in all required fields",
@@ -145,6 +151,8 @@ const BuyerProfile = () => {
     setIsLoading(true);
 
     try {
+      const validPreferredCrops = formData.preferred_crops.filter(isValidSelectValue);
+      
       const dataToSubmit = {
         user_id: user.id,
         company_name: formData.company_name,
@@ -152,7 +160,7 @@ const BuyerProfile = () => {
         location: formData.location,
         phone_number: formData.phone_number,
         minimum_order_kg: formData.minimum_order_kg ? parseFloat(formData.minimum_order_kg) : null,
-        preferred_crops: formData.preferred_crops.filter(isValidSelectValue).length > 0 ? formData.preferred_crops.filter(isValidSelectValue) : null,
+        preferred_crops: validPreferredCrops.length > 0 ? validPreferredCrops : null,
       };
 
       let result;
@@ -193,7 +201,10 @@ const BuyerProfile = () => {
   };
 
   const toggleCrop = (crop: string) => {
-    if (!isValidSelectValue(crop)) return;
+    if (!isValidSelectValue(crop)) {
+      console.warn('Invalid crop value:', crop);
+      return;
+    }
     
     setFormData(prev => ({
       ...prev,
@@ -266,17 +277,27 @@ const BuyerProfile = () => {
                 <Label htmlFor="business_type">Business Type *</Label>
                 <Select 
                   value={isValidSelectValue(formData.business_type) ? formData.business_type : undefined} 
-                  onValueChange={(value) => setFormData({...formData, business_type: value || ''})}
+                  onValueChange={(value) => {
+                    console.log('Business type selected:', value);
+                    setFormData({...formData, business_type: value || ''});
+                  }}
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="Select business type" />
                   </SelectTrigger>
                   <SelectContent>
-                    {BUSINESS_TYPES.map((type) => (
-                      <SelectItem key={type} value={type}>
-                        {type.charAt(0).toUpperCase() + type.slice(1)}
-                      </SelectItem>
-                    ))}
+                    {BUSINESS_TYPES.map((type) => {
+                      console.log('Rendering business type SelectItem:', type);
+                      if (!isValidSelectValue(type)) {
+                        console.warn('Skipping invalid business type:', type);
+                        return null;
+                      }
+                      return (
+                        <SelectItem key={`business-${type}`} value={type}>
+                          {type.charAt(0).toUpperCase() + type.slice(1)}
+                        </SelectItem>
+                      );
+                    })}
                   </SelectContent>
                 </Select>
               </div>
@@ -285,17 +306,27 @@ const BuyerProfile = () => {
                 <Label htmlFor="location">Location *</Label>
                 <Select 
                   value={isValidSelectValue(formData.location) ? formData.location : undefined} 
-                  onValueChange={(value) => setFormData({...formData, location: value || ''})}
+                  onValueChange={(value) => {
+                    console.log('Location selected:', value);
+                    setFormData({...formData, location: value || ''});
+                  }}
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="Select location" />
                   </SelectTrigger>
                   <SelectContent>
-                    {KENYAN_COUNTIES.map((county) => (
-                      <SelectItem key={county} value={county}>
-                        {county}
-                      </SelectItem>
-                    ))}
+                    {KENYAN_COUNTIES.map((county) => {
+                      console.log('Rendering county SelectItem:', county);
+                      if (!isValidSelectValue(county)) {
+                        console.warn('Skipping invalid county:', county);
+                        return null;
+                      }
+                      return (
+                        <SelectItem key={`county-${county}`} value={county}>
+                          {county}
+                        </SelectItem>
+                      );
+                    })}
                   </SelectContent>
                 </Select>
               </div>
@@ -327,19 +358,25 @@ const BuyerProfile = () => {
             <div className="space-y-2">
               <Label>Preferred Crops</Label>
               <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
-                {AVAILABLE_CROPS.map((crop) => (
-                  <div key={crop} className="flex items-center space-x-2">
-                    <Button
-                      type="button"
-                      variant={formData.preferred_crops.includes(crop) ? "default" : "outline"}
-                      size="sm"
-                      onClick={() => toggleCrop(crop)}
-                      className={formData.preferred_crops.includes(crop) ? "bg-green-600 hover:bg-green-700" : ""}
-                    >
-                      {crop}
-                    </Button>
-                  </div>
-                ))}
+                {AVAILABLE_CROPS.map((crop) => {
+                  if (!isValidSelectValue(crop)) {
+                    console.warn('Skipping invalid crop:', crop);
+                    return null;
+                  }
+                  return (
+                    <div key={`crop-${crop}`} className="flex items-center space-x-2">
+                      <Button
+                        type="button"
+                        variant={formData.preferred_crops.includes(crop) ? "default" : "outline"}
+                        size="sm"
+                        onClick={() => toggleCrop(crop)}
+                        className={formData.preferred_crops.includes(crop) ? "bg-green-600 hover:bg-green-700" : ""}
+                      >
+                        {crop}
+                      </Button>
+                    </div>
+                  );
+                })}
               </div>
             </div>
 
@@ -406,7 +443,7 @@ const BuyerProfile = () => {
             <h4 className="font-medium text-gray-900 mb-2">Preferred Crops</h4>
             <div className="flex flex-wrap gap-2">
               {profile.preferred_crops.filter(isValidSelectValue).map(crop => (
-                <Badge key={crop} variant="secondary">
+                <Badge key={`display-crop-${crop}`} variant="secondary">
                   {crop}
                 </Badge>
               ))}

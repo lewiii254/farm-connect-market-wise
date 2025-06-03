@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -22,7 +21,7 @@ interface BuyerProfileData {
   preferred_crops: string[] | null;
 }
 
-// Define constants with proper validation
+// Define constants with proper validation - filter out any empty strings
 const BUSINESS_TYPES = [
   'supermarket',
   'restaurant', 
@@ -32,7 +31,7 @@ const BUSINESS_TYPES = [
   'retailer',
   'hotel',
   'institution'
-];
+].filter(type => type && type.trim() !== '');
 
 const KENYAN_COUNTIES = [
   'Nairobi',
@@ -49,7 +48,7 @@ const KENYAN_COUNTIES = [
   'Meru',
   'Nyeri',
   'Kericho'
-];
+].filter(county => county && county.trim() !== '');
 
 const AVAILABLE_CROPS = [
   'Maize',
@@ -63,7 +62,7 @@ const AVAILABLE_CROPS = [
   'Onions',
   'Cabbage',
   'Spinach'
-];
+].filter(crop => crop && crop.trim() !== '');
 
 const BuyerProfile = () => {
   const { user } = useAuth();
@@ -78,6 +77,21 @@ const BuyerProfile = () => {
     minimum_order_kg: '',
     preferred_crops: [] as string[],
   });
+
+  useEffect(() => {
+    console.log('BUSINESS_TYPES:', BUSINESS_TYPES);
+    console.log('KENYAN_COUNTIES:', KENYAN_COUNTIES);
+    console.log('AVAILABLE_CROPS:', AVAILABLE_CROPS);
+    
+    // Check for any empty strings in arrays
+    const emptyBusinessTypes = BUSINESS_TYPES.filter(type => !type || type.trim() === '');
+    const emptyCounties = KENYAN_COUNTIES.filter(county => !county || county.trim() === '');
+    const emptyCrops = AVAILABLE_CROPS.filter(crop => !crop || crop.trim() === '');
+    
+    if (emptyBusinessTypes.length > 0) console.error('Empty business types found:', emptyBusinessTypes);
+    if (emptyCounties.length > 0) console.error('Empty counties found:', emptyCounties);
+    if (emptyCrops.length > 0) console.error('Empty crops found:', emptyCrops);
+  }, []);
 
   useEffect(() => {
     if (user) {
@@ -266,6 +280,7 @@ const BuyerProfile = () => {
                 <Select 
                   value={formData.business_type || undefined} 
                   onValueChange={(value) => {
+                    console.log('Business type selected:', value);
                     if (BUSINESS_TYPES.includes(value)) {
                       setFormData({...formData, business_type: value});
                     }
@@ -275,11 +290,18 @@ const BuyerProfile = () => {
                     <SelectValue placeholder="Select business type" />
                   </SelectTrigger>
                   <SelectContent>
-                    {BUSINESS_TYPES.map((type) => (
-                      <SelectItem key={type} value={type}>
-                        {type.charAt(0).toUpperCase() + type.slice(1)}
-                      </SelectItem>
-                    ))}
+                    {BUSINESS_TYPES.map((type) => {
+                      console.log('Rendering business type:', type, 'Length:', type.length);
+                      if (!type || type.trim() === '') {
+                        console.error('Found empty business type!');
+                        return null;
+                      }
+                      return (
+                        <SelectItem key={type} value={type}>
+                          {type.charAt(0).toUpperCase() + type.slice(1)}
+                        </SelectItem>
+                      );
+                    })}
                   </SelectContent>
                 </Select>
               </div>
@@ -289,6 +311,7 @@ const BuyerProfile = () => {
                 <Select 
                   value={formData.location || undefined} 
                   onValueChange={(value) => {
+                    console.log('Location selected:', value);
                     if (KENYAN_COUNTIES.includes(value)) {
                       setFormData({...formData, location: value});
                     }
@@ -298,11 +321,18 @@ const BuyerProfile = () => {
                     <SelectValue placeholder="Select location" />
                   </SelectTrigger>
                   <SelectContent>
-                    {KENYAN_COUNTIES.map((county) => (
-                      <SelectItem key={county} value={county}>
-                        {county}
-                      </SelectItem>
-                    ))}
+                    {KENYAN_COUNTIES.map((county) => {
+                      console.log('Rendering county:', county, 'Length:', county.length);
+                      if (!county || county.trim() === '') {
+                        console.error('Found empty county!');
+                        return null;
+                      }
+                      return (
+                        <SelectItem key={county} value={county}>
+                          {county}
+                        </SelectItem>
+                      );
+                    })}
                   </SelectContent>
                 </Select>
               </div>

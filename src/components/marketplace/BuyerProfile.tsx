@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -22,7 +21,7 @@ interface BuyerProfileData {
   preferred_crops: string[] | null;
 }
 
-// Define constants to prevent any empty values
+// Define constants with explicit validation
 const BUSINESS_TYPES = [
   'supermarket',
   'restaurant',
@@ -32,7 +31,7 @@ const BUSINESS_TYPES = [
   'retailer',
   'hotel',
   'institution'
-];
+].filter(type => type && type.trim().length > 0);
 
 const KENYAN_COUNTIES = [
   'Nairobi',
@@ -49,7 +48,7 @@ const KENYAN_COUNTIES = [
   'Meru',
   'Nyeri',
   'Kericho'
-];
+].filter(county => county && county.trim().length > 0);
 
 const AVAILABLE_CROPS = [
   'Maize',
@@ -63,7 +62,12 @@ const AVAILABLE_CROPS = [
   'Onions',
   'Cabbage',
   'Spinach'
-];
+].filter(crop => crop && crop.trim().length > 0);
+
+// Helper function to validate select values
+const isValidSelectValue = (value: any): value is string => {
+  return typeof value === 'string' && value.trim().length > 0;
+};
 
 const BuyerProfile = () => {
   const { user } = useAuth();
@@ -107,7 +111,7 @@ const BuyerProfile = () => {
           location: data.location || '',
           phone_number: data.phone_number || '',
           minimum_order_kg: data.minimum_order_kg?.toString() || '',
-          preferred_crops: data.preferred_crops || [],
+          preferred_crops: data.preferred_crops?.filter(isValidSelectValue) || [],
         });
       } else {
         setIsEditing(true);
@@ -148,7 +152,7 @@ const BuyerProfile = () => {
         location: formData.location,
         phone_number: formData.phone_number,
         minimum_order_kg: formData.minimum_order_kg ? parseFloat(formData.minimum_order_kg) : null,
-        preferred_crops: formData.preferred_crops.length > 0 ? formData.preferred_crops : null,
+        preferred_crops: formData.preferred_crops.filter(isValidSelectValue).length > 0 ? formData.preferred_crops.filter(isValidSelectValue) : null,
       };
 
       let result;
@@ -189,6 +193,8 @@ const BuyerProfile = () => {
   };
 
   const toggleCrop = (crop: string) => {
+    if (!isValidSelectValue(crop)) return;
+    
     setFormData(prev => ({
       ...prev,
       preferred_crops: prev.preferred_crops.includes(crop)
@@ -259,7 +265,7 @@ const BuyerProfile = () => {
               <div className="space-y-2">
                 <Label htmlFor="business_type">Business Type *</Label>
                 <Select 
-                  value={formData.business_type || undefined} 
+                  value={isValidSelectValue(formData.business_type) ? formData.business_type : undefined} 
                   onValueChange={(value) => setFormData({...formData, business_type: value || ''})}
                 >
                   <SelectTrigger>
@@ -278,7 +284,7 @@ const BuyerProfile = () => {
               <div className="space-y-2">
                 <Label htmlFor="location">Location *</Label>
                 <Select 
-                  value={formData.location || undefined} 
+                  value={isValidSelectValue(formData.location) ? formData.location : undefined} 
                   onValueChange={(value) => setFormData({...formData, location: value || ''})}
                 >
                   <SelectTrigger>
@@ -399,7 +405,7 @@ const BuyerProfile = () => {
           <div>
             <h4 className="font-medium text-gray-900 mb-2">Preferred Crops</h4>
             <div className="flex flex-wrap gap-2">
-              {profile.preferred_crops.map(crop => (
+              {profile.preferred_crops.filter(isValidSelectValue).map(crop => (
                 <Badge key={crop} variant="secondary">
                   {crop}
                 </Badge>

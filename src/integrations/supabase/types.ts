@@ -9,7 +9,87 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never
+      mpesa_transactions: {
+        Row: {
+          amount: number
+          created_at: string | null
+          description: string | null
+          id: string
+          phone_number: string
+          reference: string | null
+          status: string | null
+          transaction_id: string
+          transaction_type: string | null
+          updated_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          amount: number
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          phone_number: string
+          reference?: string | null
+          status?: string | null
+          transaction_id: string
+          transaction_type?: string | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          amount?: number
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          phone_number?: string
+          reference?: string | null
+          status?: string | null
+          transaction_id?: string
+          transaction_type?: string | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          county: string | null
+          created_at: string | null
+          farm_size_acres: number | null
+          full_name: string | null
+          id: string
+          mpesa_phone_number: string | null
+          phone_number: string | null
+          primary_crops: string[] | null
+          updated_at: string | null
+          username: string | null
+        }
+        Insert: {
+          county?: string | null
+          created_at?: string | null
+          farm_size_acres?: number | null
+          full_name?: string | null
+          id: string
+          mpesa_phone_number?: string | null
+          phone_number?: string | null
+          primary_crops?: string[] | null
+          updated_at?: string | null
+          username?: string | null
+        }
+        Update: {
+          county?: string | null
+          created_at?: string | null
+          farm_size_acres?: number | null
+          full_name?: string | null
+          id?: string
+          mpesa_phone_number?: string | null
+          phone_number?: string | null
+          primary_crops?: string[] | null
+          updated_at?: string | null
+          username?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

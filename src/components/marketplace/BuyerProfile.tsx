@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -21,8 +22,8 @@ interface BuyerProfileData {
   preferred_crops: string[] | null;
 }
 
-// Define constants with extremely strict validation
-const BUSINESS_TYPES = [
+// Clean arrays at definition time with immediate filtering
+const RAW_BUSINESS_TYPES = [
   'supermarket',
   'restaurant', 
   'wholesaler',
@@ -31,9 +32,9 @@ const BUSINESS_TYPES = [
   'retailer',
   'hotel',
   'institution'
-].filter(type => type && typeof type === 'string' && type.trim().length > 0);
+];
 
-const KENYAN_COUNTIES = [
+const RAW_KENYAN_COUNTIES = [
   'Nairobi',
   'Mombasa',
   'Nakuru',
@@ -48,9 +49,9 @@ const KENYAN_COUNTIES = [
   'Meru',
   'Nyeri',
   'Kericho'
-].filter(county => county && typeof county === 'string' && county.trim().length > 0);
+];
 
-const AVAILABLE_CROPS = [
+const RAW_AVAILABLE_CROPS = [
   'Maize',
   'Beans',
   'Potatoes',
@@ -62,7 +63,20 @@ const AVAILABLE_CROPS = [
   'Onions',
   'Cabbage',
   'Spinach'
-].filter(crop => crop && typeof crop === 'string' && crop.trim().length > 0);
+];
+
+// Apply strict filtering immediately
+const BUSINESS_TYPES = RAW_BUSINESS_TYPES.filter(type => 
+  type && typeof type === 'string' && type.trim().length > 0
+);
+
+const KENYAN_COUNTIES = RAW_KENYAN_COUNTIES.filter(county => 
+  county && typeof county === 'string' && county.trim().length > 0
+);
+
+const AVAILABLE_CROPS = RAW_AVAILABLE_CROPS.filter(crop => 
+  crop && typeof crop === 'string' && crop.trim().length > 0
+);
 
 const BuyerProfile = () => {
   const { user } = useAuth();
@@ -77,21 +91,6 @@ const BuyerProfile = () => {
     minimum_order_kg: '',
     preferred_crops: [] as string[],
   });
-
-  useEffect(() => {
-    console.log('BUSINESS_TYPES:', BUSINESS_TYPES);
-    console.log('KENYAN_COUNTIES:', KENYAN_COUNTIES);
-    console.log('AVAILABLE_CROPS:', AVAILABLE_CROPS);
-    
-    // Check for any invalid values in arrays
-    const invalidBusinessTypes = BUSINESS_TYPES.filter(type => !type || typeof type !== 'string' || type.trim().length === 0);
-    const invalidCounties = KENYAN_COUNTIES.filter(county => !county || typeof county !== 'string' || county.trim().length === 0);
-    const invalidCrops = AVAILABLE_CROPS.filter(crop => !crop || typeof crop !== 'string' || crop.trim().length === 0);
-    
-    if (invalidBusinessTypes.length > 0) console.error('Invalid business types found:', invalidBusinessTypes);
-    if (invalidCounties.length > 0) console.error('Invalid counties found:', invalidCounties);
-    if (invalidCrops.length > 0) console.error('Invalid crops found:', invalidCrops);
-  }, []);
 
   useEffect(() => {
     if (user) {
@@ -203,7 +202,7 @@ const BuyerProfile = () => {
   };
 
   const toggleCrop = (crop: string) => {
-    if (!isValidValue(crop)) {
+    if (!crop || typeof crop !== 'string' || crop.trim().length === 0) {
       console.warn('Invalid crop value:', crop);
       return;
     }
@@ -216,10 +215,6 @@ const BuyerProfile = () => {
     }));
   };
 
-  const isValidValue = (value: string): boolean => {
-    return value && typeof value === 'string' && value.trim().length > 0;
-  };
-
   const getVerificationColor = (status: string) => {
     switch (status) {
       case 'verified': return 'bg-green-100 text-green-800';
@@ -229,35 +224,24 @@ const BuyerProfile = () => {
     }
   };
 
-  // Ultra-safe helper function to render SelectItems with maximum validation
+  // Safe SelectItem renderer with final validation
   const renderSelectItems = (items: string[], labelTransform?: (item: string) => string) => {
-    console.log('renderSelectItems called with:', items);
-    
-    const validItems = items.filter(item => {
-      const isValid = item && typeof item === 'string' && item.trim().length > 0;
-      if (!isValid) {
-        console.warn('Filtering out invalid item:', item);
-      }
-      return isValid;
-    });
-
-    console.log('Valid items after filtering:', validItems);
-
-    return validItems.map((item) => {
-      // Final safety check before rendering
-      if (!item || typeof item !== 'string' || item.trim().length === 0) {
-        console.error('CRITICAL: Invalid item reached SelectItem rendering:', item);
-        return null;
-      }
-      
-      console.log('Rendering SelectItem with value:', item);
-      
-      return (
-        <SelectItem key={item} value={item}>
-          {labelTransform ? labelTransform(item) : item}
-        </SelectItem>
-      );
-    }).filter(Boolean);
+    return items
+      .filter(item => item && typeof item === 'string' && item.trim().length > 0)
+      .map((item) => {
+        // Final safety check - if this fails, log error but don't crash
+        if (!item || typeof item !== 'string' || item.trim().length === 0) {
+          console.error('CRITICAL: Empty item reached SelectItem rendering:', item);
+          return null;
+        }
+        
+        return (
+          <SelectItem key={item} value={item}>
+            {labelTransform ? labelTransform(item) : item}
+          </SelectItem>
+        );
+      })
+      .filter(Boolean);
   };
 
   if (isLoading) {
@@ -316,10 +300,8 @@ const BuyerProfile = () => {
                   value={formData.business_type || undefined} 
                   onValueChange={(value) => {
                     console.log('Business type selected:', value);
-                    if (value && typeof value === 'string' && value.trim().length > 0 && BUSINESS_TYPES.includes(value)) {
+                    if (value && BUSINESS_TYPES.includes(value)) {
                       setFormData({...formData, business_type: value});
-                    } else {
-                      console.warn('Invalid business type selected:', value);
                     }
                   }}
                 >
@@ -338,10 +320,8 @@ const BuyerProfile = () => {
                   value={formData.location || undefined} 
                   onValueChange={(value) => {
                     console.log('Location selected:', value);
-                    if (value && typeof value === 'string' && value.trim().length > 0 && KENYAN_COUNTIES.includes(value)) {
+                    if (value && KENYAN_COUNTIES.includes(value)) {
                       setFormData({...formData, location: value});
-                    } else {
-                      console.warn('Invalid location selected:', value);
                     }
                   }}
                 >
@@ -381,21 +361,19 @@ const BuyerProfile = () => {
             <div className="space-y-2">
               <Label>Preferred Crops</Label>
               <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
-                {AVAILABLE_CROPS
-                  .filter(crop => isValidValue(crop))
-                  .map((crop) => (
-                    <div key={crop} className="flex items-center space-x-2">
-                      <Button
-                        type="button"
-                        variant={formData.preferred_crops.includes(crop) ? "default" : "outline"}
-                        size="sm"
-                        onClick={() => toggleCrop(crop)}
-                        className={formData.preferred_crops.includes(crop) ? "bg-green-600 hover:bg-green-700" : ""}
-                      >
-                        {crop}
-                      </Button>
-                    </div>
-                  ))}
+                {AVAILABLE_CROPS.map((crop) => (
+                  <div key={crop} className="flex items-center space-x-2">
+                    <Button
+                      type="button"
+                      variant={formData.preferred_crops.includes(crop) ? "default" : "outline"}
+                      size="sm"
+                      onClick={() => toggleCrop(crop)}
+                      className={formData.preferred_crops.includes(crop) ? "bg-green-600 hover:bg-green-700" : ""}
+                    >
+                      {crop}
+                    </Button>
+                  </div>
+                ))}
               </div>
             </div>
 

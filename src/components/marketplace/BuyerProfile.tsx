@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -25,6 +24,14 @@ interface BuyerProfileData {
 // Helper function to validate and filter values
 const isValidSelectValue = (value: any): value is string => {
   return typeof value === 'string' && value.trim().length > 0 && value !== '';
+};
+
+// Helper function to get safe select value (converts empty strings to undefined)
+const getSafeSelectValue = (value: string | undefined | null): string | undefined => {
+  if (!value || value.trim() === '') {
+    return undefined;
+  }
+  return value;
 };
 
 // Define constants with ultra-strict validation
@@ -276,7 +283,7 @@ const BuyerProfile = () => {
               <div className="space-y-2">
                 <Label htmlFor="business_type">Business Type *</Label>
                 <Select 
-                  value={isValidSelectValue(formData.business_type) ? formData.business_type : undefined} 
+                  value={getSafeSelectValue(formData.business_type)} 
                   onValueChange={(value) => {
                     console.log('Business type selected:', value);
                     setFormData({...formData, business_type: value || ''});
@@ -286,18 +293,11 @@ const BuyerProfile = () => {
                     <SelectValue placeholder="Select business type" />
                   </SelectTrigger>
                   <SelectContent>
-                    {BUSINESS_TYPES.map((type) => {
-                      console.log('Rendering business type SelectItem:', type);
-                      if (!isValidSelectValue(type)) {
-                        console.warn('Skipping invalid business type:', type);
-                        return null;
-                      }
-                      return (
-                        <SelectItem key={`business-${type}`} value={type}>
-                          {type.charAt(0).toUpperCase() + type.slice(1)}
-                        </SelectItem>
-                      );
-                    })}
+                    {BUSINESS_TYPES.map((type) => (
+                      <SelectItem key={`business-${type}`} value={type}>
+                        {type.charAt(0).toUpperCase() + type.slice(1)}
+                      </SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
               </div>
@@ -305,7 +305,7 @@ const BuyerProfile = () => {
               <div className="space-y-2">
                 <Label htmlFor="location">Location *</Label>
                 <Select 
-                  value={isValidSelectValue(formData.location) ? formData.location : undefined} 
+                  value={getSafeSelectValue(formData.location)} 
                   onValueChange={(value) => {
                     console.log('Location selected:', value);
                     setFormData({...formData, location: value || ''});
@@ -315,18 +315,11 @@ const BuyerProfile = () => {
                     <SelectValue placeholder="Select location" />
                   </SelectTrigger>
                   <SelectContent>
-                    {KENYAN_COUNTIES.map((county) => {
-                      console.log('Rendering county SelectItem:', county);
-                      if (!isValidSelectValue(county)) {
-                        console.warn('Skipping invalid county:', county);
-                        return null;
-                      }
-                      return (
-                        <SelectItem key={`county-${county}`} value={county}>
-                          {county}
-                        </SelectItem>
-                      );
-                    })}
+                    {KENYAN_COUNTIES.map((county) => (
+                      <SelectItem key={`county-${county}`} value={county}>
+                        {county}
+                      </SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
               </div>
@@ -358,25 +351,19 @@ const BuyerProfile = () => {
             <div className="space-y-2">
               <Label>Preferred Crops</Label>
               <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
-                {AVAILABLE_CROPS.map((crop) => {
-                  if (!isValidSelectValue(crop)) {
-                    console.warn('Skipping invalid crop:', crop);
-                    return null;
-                  }
-                  return (
-                    <div key={`crop-${crop}`} className="flex items-center space-x-2">
-                      <Button
-                        type="button"
-                        variant={formData.preferred_crops.includes(crop) ? "default" : "outline"}
-                        size="sm"
-                        onClick={() => toggleCrop(crop)}
-                        className={formData.preferred_crops.includes(crop) ? "bg-green-600 hover:bg-green-700" : ""}
-                      >
-                        {crop}
-                      </Button>
-                    </div>
-                  );
-                })}
+                {AVAILABLE_CROPS.map((crop) => (
+                  <div key={`crop-${crop}`} className="flex items-center space-x-2">
+                    <Button
+                      type="button"
+                      variant={formData.preferred_crops.includes(crop) ? "default" : "outline"}
+                      size="sm"
+                      onClick={() => toggleCrop(crop)}
+                      className={formData.preferred_crops.includes(crop) ? "bg-green-600 hover:bg-green-700" : ""}
+                    >
+                      {crop}
+                    </Button>
+                  </div>
+                ))}
               </div>
             </div>
 

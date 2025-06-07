@@ -14,6 +14,8 @@ import Dashboard from "./pages/Dashboard";
 import Community from "./pages/Community";
 import SupplyChain from "./pages/SupplyChain";
 import FinancialServices from "./pages/FinancialServices";
+import YouthMentorshipPage from "./pages/YouthMentorship";
+import AgriEducationPage from "./pages/AgriEducation";
 import Auth from "./pages/Auth";
 import NotFound from "./pages/NotFound";
 
@@ -29,6 +31,8 @@ const App = () => (
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/auth" element={<Auth />} />
+            <Route path="/youth-mentorship" element={<YouthMentorshipPage />} />
+            <Route path="/agri-education" element={<AgriEducationPage />} />
             <Route path="/markets" element={
               <ProtectedRoute>
                 <Markets />

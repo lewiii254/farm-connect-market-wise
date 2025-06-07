@@ -6,7 +6,7 @@ import Stats from '@/components/Stats';
 import FloatingChat from '@/components/FloatingChat';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
-import { Users, TruckIcon, ArrowRight, CheckCircle, Star, Quote } from 'lucide-react';
+import { Users, TruckIcon, ArrowRight, CheckCircle, Star, Quote, GraduationCap, UserPlus } from 'lucide-react';
 
 const Index = () => {
   const testimonials = [
@@ -39,6 +39,134 @@ const Index = () => {
       <EnhancedHero />
       <Features />
       <Stats />
+      
+      {/* Youth Empowerment Section */}
+      <div className="bg-gradient-to-br from-blue-50 to-indigo-50 py-20">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <div className="inline-flex items-center px-4 py-2 bg-blue-100 rounded-full text-blue-800 text-sm font-medium mb-6">
+              <GraduationCap className="h-4 w-4 mr-2" />
+              Empowering Kenya's Young Farmers
+            </div>
+            <h2 className="text-3xl font-extrabold text-gray-900 sm:text-4xl mb-4">
+              Special Programs for <span className="text-blue-600">Youth in Agriculture</span>
+            </h2>
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+              We're committed to empowering the next generation of Kenyan farmers with specialized mentorship, 
+              education, and opportunities designed specifically for youth aged 18-35.
+            </p>
+          </div>
+          
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+            {/* Youth Mentorship */}
+            <div className="bg-white rounded-2xl p-8 border border-blue-100 hover:shadow-lg transition-all duration-300 hover-scale">
+              <div className="flex items-center justify-center w-16 h-16 bg-blue-600 rounded-2xl mb-6">
+                <UserPlus className="h-8 w-8 text-white" />
+              </div>
+              <h3 className="text-2xl font-bold text-gray-900 mb-4">Youth Mentorship Program</h3>
+              <p className="text-gray-600 mb-6 leading-relaxed">
+                Connect with experienced farmers who've built successful agricultural businesses. 
+                Get 1-on-1 guidance, practical training, and access to networks that will accelerate your farming journey.
+              </p>
+              <ul className="space-y-2 mb-6">
+                <li className="flex items-center text-gray-700">
+                  <CheckCircle className="h-5 w-5 text-green-500 mr-3" />
+                  Personal mentor matching
+                </li>
+                <li className="flex items-center text-gray-700">
+                  <CheckCircle className="h-5 w-5 text-green-500 mr-3" />
+                  6-month intensive program
+                </li>
+                <li className="flex items-center text-gray-700">
+                  <CheckCircle className="h-5 w-5 text-green-500 mr-3" />
+                  Seed capital opportunities
+                </li>
+                <li className="flex items-center text-gray-700">
+                  <CheckCircle className="h-5 w-5 text-green-500 mr-3" />
+                  Market access support
+                </li>
+              </ul>
+              <div className="flex items-center justify-between mb-6">
+                <div className="text-sm text-gray-600">
+                  <span className="font-medium text-blue-600">150+ mentors</span> • 800+ youth enrolled
+                </div>
+                <div className="text-sm font-medium text-green-600 bg-green-50 px-3 py-1 rounded-full">
+                  92% success rate
+                </div>
+              </div>
+              <Link to="/youth-mentorship">
+                <Button className="w-full bg-blue-600 hover:bg-blue-700 text-white group">
+                  Join Mentorship Program
+                  <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
+                </Button>
+              </Link>
+            </div>
+            
+            {/* Agricultural Education */}
+            <div className="bg-white rounded-2xl p-8 border border-green-100 hover:shadow-lg transition-all duration-300 hover-scale">
+              <div className="flex items-center justify-center w-16 h-16 bg-green-600 rounded-2xl mb-6">
+                <GraduationCap className="h-8 w-8 text-white" />
+              </div>
+              <h3 className="text-2xl font-bold text-gray-900 mb-4">Agricultural Education Hub</h3>
+              <p className="text-gray-600 mb-6 leading-relaxed">
+                Access comprehensive agricultural courses, workshops, and resources designed specifically for young farmers. 
+                Learn modern techniques, business skills, and get certified to boost your farming career.
+              </p>
+              <ul className="space-y-2 mb-6">
+                <li className="flex items-center text-gray-700">
+                  <CheckCircle className="h-5 w-5 text-green-500 mr-3" />
+                  120+ courses available
+                </li>
+                <li className="flex items-center text-gray-700">
+                  <CheckCircle className="h-5 w-5 text-green-500 mr-3" />
+                  Live workshops & webinars
+                </li>
+                <li className="flex items-center text-gray-700">
+                  <CheckCircle className="h-5 w-5 text-green-500 mr-3" />
+                  Mobile-friendly learning
+                </li>
+                <li className="flex items-center text-gray-700">
+                  <CheckCircle className="h-5 w-5 text-green-500 mr-3" />
+                  Industry certifications
+                </li>
+              </ul>
+              <div className="flex items-center justify-between mb-6">
+                <div className="text-sm text-gray-600">
+                  <span className="font-medium text-green-600">3,500+ students</span> • 2,100+ certificates
+                </div>
+                <div className="text-sm font-medium text-green-600 bg-green-50 px-3 py-1 rounded-full">
+                  94% completion rate
+                </div>
+              </div>
+              <Link to="/agri-education">
+                <Button className="w-full bg-green-600 hover:bg-green-700 text-white group">
+                  Start Learning Today
+                  <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
+                </Button>
+              </Link>
+            </div>
+          </div>
+
+          {/* Youth Impact Stats */}
+          <div className="mt-16 text-center">
+            <h3 className="text-2xl font-bold text-gray-900 mb-8">Our Impact on Young Farmers</h3>
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+              {[
+                { value: "950+", label: "Youth Farmers Trained", change: "+45% this year" },
+                { value: "240+", label: "Youth-Led Businesses", change: "Started in 2024" },
+                { value: "KSh 12M+", label: "Additional Income Generated", change: "For young farmers" },
+                { value: "15", label: "Counties Reached", change: "Across Kenya" }
+              ].map((stat, index) => (
+                <div key={index} className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+                  <div className="text-2xl font-bold text-blue-600 mb-2">{stat.value}</div>
+                  <div className="text-sm font-medium text-gray-900 mb-1">{stat.label}</div>
+                  <div className="text-xs text-green-600">{stat.change}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
       
       {/* Keep existing enhanced features section */}
       <div className="bg-white py-20">
@@ -224,8 +352,8 @@ const Index = () => {
                 <li><Link to="/markets" className="hover:text-white transition-colors">Market Prices</Link></li>
                 <li><Link to="/buyers" className="hover:text-white transition-colors">Marketplace</Link></li>
                 <li><Link to="/community" className="hover:text-white transition-colors">Community</Link></li>
-                <li><Link to="/supply-chain" className="hover:text-white transition-colors">Supply Chain</Link></li>
-                <li><Link to="/financial-services" className="hover:text-white transition-colors">Financial Services</Link></li>
+                <li><Link to="/youth-mentorship" className="hover:text-white transition-colors">Youth Mentorship</Link></li>
+                <li><Link to="/agri-education" className="hover:text-white transition-colors">Agricultural Education</Link></li>
               </ul>
             </div>
             <div>

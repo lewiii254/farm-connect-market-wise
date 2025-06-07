@@ -17,10 +17,12 @@ import {
 } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from "@/hooks/use-toast";
+import { useAuth } from '@/hooks/useAuth';
 
 const Navigation = () => {
   const location = useLocation();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const { user } = useAuth();
 
   const mainNavItems = [
     { 
@@ -71,14 +73,21 @@ const Navigation = () => {
   ];
 
   const handleGetStarted = () => {
-    toast({
-      title: "Welcome to FarmConnect!",
-      description: "Join Kenya's leading agricultural marketplace and boost your farming profits.",
-    });
+    if (user) {
+      toast({
+        title: "Welcome back!",
+        description: "Redirecting to your dashboard...",
+      });
+    } else {
+      toast({
+        title: "Welcome to FarmConnect!",
+        description: "Join Kenya's leading agricultural marketplace and boost your farming profits.",
+      });
+    }
   };
 
   return (
-    <nav className="bg-white shadow-lg sticky top-0 z-50 border-b border-gray-100">
+    <nav className="bg-white/95 backdrop-blur-md shadow-lg sticky top-0 z-40 border-b border-gray-100">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
@@ -157,13 +166,15 @@ const Navigation = () => {
             </div>
 
             {/* CTA Button */}
-            <Button 
-              className="bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white px-6 py-2 rounded-xl shadow-md hover:shadow-lg transition-all duration-200 font-medium" 
-              onClick={handleGetStarted}
-            >
-              <Users className="h-4 w-4 mr-2" />
-              Get Started
-            </Button>
+            <Link to={user ? "/dashboard" : "/auth"}>
+              <Button 
+                className="bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white px-6 py-2 rounded-xl shadow-md hover:shadow-lg transition-all duration-200 font-medium" 
+                onClick={handleGetStarted}
+              >
+                <Users className="h-4 w-4 mr-2" />
+                {user ? "Dashboard" : "Get Started"}
+              </Button>
+            </Link>
           </div>
 
           {/* Mobile menu button */}
@@ -179,7 +190,7 @@ const Navigation = () => {
 
         {/* Enhanced Mobile Navigation */}
         {isMenuOpen && (
-          <div className="lg:hidden border-t border-gray-100 bg-white">
+          <div className="lg:hidden border-t border-gray-100 bg-white/95 backdrop-blur-md">
             <div className="px-4 pt-4 pb-6 space-y-1">
               {/* Main Items */}
               <div className="mb-4">
@@ -239,13 +250,18 @@ const Navigation = () => {
 
               {/* CTA */}
               <div className="pt-4 border-t border-gray-100">
-                <Button 
-                  className="w-full bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white rounded-xl py-3" 
-                  onClick={handleGetStarted}
-                >
-                  <Users className="h-4 w-4 mr-2" />
-                  Join FarmConnect Today
-                </Button>
+                <Link to={user ? "/dashboard" : "/auth"}>
+                  <Button 
+                    className="w-full bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white rounded-xl py-3" 
+                    onClick={() => {
+                      handleGetStarted();
+                      setIsMenuOpen(false);
+                    }}
+                  >
+                    <Users className="h-4 w-4 mr-2" />
+                    {user ? "Go to Dashboard" : "Join FarmConnect Today"}
+                  </Button>
+                </Link>
               </div>
             </div>
           </div>

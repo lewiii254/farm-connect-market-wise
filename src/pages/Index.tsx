@@ -1,9 +1,9 @@
-
 import React from 'react';
 import Navigation from '@/components/Navigation';
-import Hero from '@/components/Hero';
+import EnhancedHero from '@/components/EnhancedHero';
 import Features from '@/components/Features';
 import Stats from '@/components/Stats';
+import FloatingChat from '@/components/FloatingChat';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
 import { Users, TruckIcon, ArrowRight, CheckCircle, Star, Quote } from 'lucide-react';
@@ -36,11 +36,11 @@ const Index = () => {
   return (
     <div className="min-h-screen">
       <Navigation />
-      <Hero />
+      <EnhancedHero />
       <Features />
       <Stats />
       
-      {/* New Enhanced Features Section */}
+      {/* Keep existing enhanced features section */}
       <div className="bg-white py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
@@ -54,7 +54,7 @@ const Index = () => {
           
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
             {/* Community Feature */}
-            <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl p-8 border border-blue-100">
+            <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl p-8 border border-blue-100 hover:shadow-lg transition-all duration-300 hover-scale">
               <div className="flex items-center justify-center w-16 h-16 bg-blue-600 rounded-2xl mb-6">
                 <Users className="h-8 w-8 text-white" />
               </div>
@@ -79,15 +79,15 @@ const Index = () => {
                 </li>
               </ul>
               <Link to="/community">
-                <Button className="bg-blue-600 hover:bg-blue-700 text-white">
+                <Button className="bg-blue-600 hover:bg-blue-700 text-white group">
                   Join Community
-                  <ArrowRight className="ml-2 h-4 w-4" />
+                  <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
                 </Button>
               </Link>
             </div>
             
             {/* Supply Chain Feature */}
-            <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-2xl p-8 border border-green-100">
+            <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-2xl p-8 border border-green-100 hover:shadow-lg transition-all duration-300 hover-scale">
               <div className="flex items-center justify-center w-16 h-16 bg-green-600 rounded-2xl mb-6">
                 <TruckIcon className="h-8 w-8 text-white" />
               </div>
@@ -112,9 +112,9 @@ const Index = () => {
                 </li>
               </ul>
               <Link to="/supply-chain">
-                <Button className="bg-green-600 hover:bg-green-700 text-white">
+                <Button className="bg-green-600 hover:bg-green-700 text-white group">
                   Track Your Produce
-                  <ArrowRight className="ml-2 h-4 w-4" />
+                  <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
                 </Button>
               </Link>
             </div>
@@ -122,7 +122,7 @@ const Index = () => {
         </div>
       </div>
 
-      {/* Testimonials Section */}
+      {/* Enhanced Testimonials Section */}
       <div className="bg-gray-50 py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
@@ -136,7 +136,7 @@ const Index = () => {
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {testimonials.map((testimonial, index) => (
-              <div key={index} className="bg-white rounded-xl p-6 shadow-md hover:shadow-lg transition-shadow">
+              <div key={index} className="bg-white rounded-xl p-6 shadow-md hover:shadow-lg transition-all duration-300 hover-scale">
                 <div className="flex items-center mb-4">
                   {[...Array(testimonial.rating)].map((_, i) => (
                     <Star key={i} className="h-5 w-5 text-yellow-400 fill-current" />
@@ -162,8 +162,9 @@ const Index = () => {
       </div>
       
       {/* Enhanced CTA Section */}
-      <div className="bg-gradient-to-r from-green-600 to-green-700 py-20">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+      <div className="bg-gradient-to-r from-green-600 to-green-700 py-20 relative overflow-hidden">
+        <div className="absolute inset-0 bg-grid-pattern opacity-20"></div>
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
           <h2 className="text-4xl font-extrabold text-white mb-6">
             Ready to Transform Your Farming Business?
           </h2>
@@ -172,10 +173,10 @@ const Index = () => {
             using FarmConnect's comprehensive agricultural platform.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link to="/buyers">
-              <Button size="lg" className="bg-white text-green-600 hover:bg-gray-50 font-bold py-4 px-8 text-lg shadow-lg">
+            <Link to="/auth">
+              <Button size="lg" className="bg-white text-green-600 hover:bg-gray-50 font-bold py-4 px-8 text-lg shadow-lg group">
                 Start Selling Now
-                <ArrowRight className="ml-2 h-5 w-5" />
+                <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
               </Button>
             </Link>
             <Link to="/markets">
@@ -190,7 +191,7 @@ const Index = () => {
         </div>
       </div>
 
-      {/* Enhanced Footer */}
+      {/* Keep existing enhanced footer */}
       <footer className="bg-gray-900 text-white py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
@@ -250,6 +251,9 @@ const Index = () => {
           </div>
         </div>
       </footer>
+
+      {/* Add Floating Chat Component */}
+      <FloatingChat />
     </div>
   );
 };

@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -12,27 +11,32 @@ import {
   Zap, 
   CheckCircle,
   AlertCircle,
-  Phone
+  Phone,
+  Loader2
 } from 'lucide-react';
 import { toast } from "@/hooks/use-toast";
+import { supabase } from '@/integrations/supabase/client';
 
 interface MpesaPaymentProps {
   amount: number;
   onSuccess?: (transactionId: string) => void;
   onError?: (error: string) => void;
   description?: string;
+  accountReference?: string;
 }
 
 export const MpesaPayment = ({ 
   amount, 
   onSuccess, 
   onError, 
-  description = "FarmConnect Payment" 
+  description = "FarmConnect Payment",
+  accountReference = "FarmConnect"
 }: MpesaPaymentProps) => {
   const [phoneNumber, setPhoneNumber] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
+  const [transactionId, setTransactionId] = useState<string | null>(null);
 
-  const handlePayment = async () => {
+  const initiatePayment = async () => {
     if (!phoneNumber || phoneNumber.length < 10) {
       toast({
         title: "Invalid Phone Number",
@@ -45,28 +49,124 @@ export const MpesaPayment = ({
     setIsProcessing(true);
     
     try {
-      // Simulate M-Pesa payment process
-      await new Promise(resolve => setTimeout(resolve, 3000));
-      
-      const transactionId = `MP${Date.now()}${Math.random().toString(36).substr(2, 9)}`;
-      
-      toast({
-        title: "Payment Successful!",
-        description: `Transaction ID: ${transactionId}`,
+      const { data, error } = await supabase.functions.invoke('mpesa-stk-push', {
+        body: {
+          phone_number: phoneNumber,
+          amount: amount,
+          account_reference: accountReference,
+          transaction_desc: description
+        }
       });
-      
-      onSuccess?.(transactionId);
+
+      if (error) {
+        throw new Error(error.message);
+      }
+
+      if (data.ResponseCode === '0') {
+        const checkoutRequestID = data.CheckoutRequestID;
+        setTransactionId(checkoutRequestID);
+        
+        toast({
+          title: "Payment Initiated",
+          description: "Please check your phone and enter your M-Pesa PIN",
+        });
+
+        // Poll for transaction status
+        pollTransactionStatus(checkoutRequestID);
+      } else {
+        throw new Error(data.ResponseDescription || 'Failed to initiate payment');
+      }
     } catch (error) {
-      const errorMessage = "Payment failed. Please try again.";
+      console.error('Payment error:', error);
+      const errorMessage = error.message || "Payment failed. Please try again.";
       toast({
         title: "Payment Failed",
         description: errorMessage,
         variant: "destructive"
       });
       onError?.(errorMessage);
-    } finally {
       setIsProcessing(false);
     }
+  };
+
+  const pollTransactionStatus = async (checkoutRequestID: string) => {
+    const maxAttempts = 30; // Poll for 5 minutes (30 * 10 seconds)
+    let attempts = 0;
+
+    const poll = async () => {
+      try {
+        const { data, error } = await supabase.functions.invoke('mpesa-status', {
+          body: {},
+          method: 'GET'
+        });
+
+        if (error) {
+          console.error('Status check error:', error);
+          attempts++;
+          if (attempts < maxAttempts) {
+            setTimeout(poll, 10000); // Poll every 10 seconds
+          } else {
+            setIsProcessing(false);
+            toast({
+              title: "Payment Timeout",
+              description: "Payment verification timed out. Please check your transaction history.",
+              variant: "destructive"
+            });
+          }
+          return;
+        }
+
+        // Check transaction status via URL parameter
+        const statusUrl = `${supabase.supabaseUrl}/functions/v1/mpesa-status?transaction_id=${checkoutRequestID}`;
+        const response = await fetch(statusUrl, {
+          headers: {
+            'Authorization': `Bearer ${supabase.supabaseKey}`,
+          },
+        });
+        
+        const transactionData = await response.json();
+
+        if (transactionData.status === 'completed') {
+          setIsProcessing(false);
+          toast({
+            title: "Payment Successful!",
+            description: `Transaction ID: ${transactionData.mpesa_receipt_number || checkoutRequestID}`,
+          });
+          onSuccess?.(transactionData.mpesa_receipt_number || checkoutRequestID);
+        } else if (transactionData.status === 'failed') {
+          setIsProcessing(false);
+          toast({
+            title: "Payment Failed",
+            description: "The payment was not completed. Please try again.",
+            variant: "destructive"
+          });
+          onError?.("Payment failed");
+        } else {
+          // Still pending, continue polling
+          attempts++;
+          if (attempts < maxAttempts) {
+            setTimeout(poll, 10000);
+          } else {
+            setIsProcessing(false);
+            toast({
+              title: "Payment Timeout",
+              description: "Payment verification timed out. Please check your transaction history.",
+              variant: "destructive"
+            });
+          }
+        }
+      } catch (error) {
+        console.error('Polling error:', error);
+        attempts++;
+        if (attempts < maxAttempts) {
+          setTimeout(poll, 10000);
+        } else {
+          setIsProcessing(false);
+        }
+      }
+    };
+
+    setTimeout(poll, 5000); // Start polling after 5 seconds
   };
 
   return (
@@ -100,14 +200,14 @@ export const MpesaPayment = ({
         </div>
 
         <Button 
-          onClick={handlePayment} 
+          onClick={initiatePayment} 
           className="w-full bg-green-600 hover:bg-green-700"
           disabled={isProcessing}
         >
           {isProcessing ? (
             <>
-              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-              Processing...
+              <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+              {transactionId ? 'Waiting for confirmation...' : 'Processing...'}
             </>
           ) : (
             <>
@@ -117,9 +217,16 @@ export const MpesaPayment = ({
           )}
         </Button>
 
+        {isProcessing && transactionId && (
+          <div className="text-center text-sm text-blue-600 bg-blue-50 p-3 rounded-lg">
+            <AlertCircle className="h-4 w-4 inline mr-1" />
+            Check your phone for M-Pesa prompt
+          </div>
+        )}
+
         <div className="flex items-center justify-center gap-2 text-xs text-gray-500">
           <Shield className="h-3 w-3" />
-          Secured by Safaricom
+          Secured by Safaricom M-Pesa
         </div>
       </CardContent>
     </Card>

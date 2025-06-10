@@ -95,9 +95,13 @@ export const MpesaPayment = ({
 
     const poll = async () => {
       try {
+        // Use the Supabase client to call the mpesa-status function directly
         const { data, error } = await supabase.functions.invoke('mpesa-status', {
+          method: 'GET',
           body: {},
-          method: 'GET'
+          headers: {
+            'Content-Type': 'application/json'
+          }
         });
 
         if (error) {
@@ -116,43 +120,62 @@ export const MpesaPayment = ({
           return;
         }
 
-        // Check transaction status via URL parameter
-        const statusUrl = `${supabase.supabaseUrl}/functions/v1/mpesa-status?transaction_id=${checkoutRequestID}`;
-        const response = await fetch(statusUrl, {
-          headers: {
-            'Authorization': `Bearer ${supabase.supabaseKey}`,
-          },
+        // Check transaction status by calling the edge function with query parameter
+        const statusResponse = await supabase.functions.invoke('mpesa-status', {
+          method: 'GET'
         });
         
-        const transactionData = await response.json();
+        if (statusResponse.error) {
+          // Try to get transaction data from database directly
+          const { data: transactionData, error: dbError } = await supabase
+            .from('mpesa_transactions')
+            .select('*')
+            .eq('transaction_id', checkoutRequestID)
+            .single();
 
-        if (transactionData.status === 'completed') {
-          setIsProcessing(false);
-          toast({
-            title: "Payment Successful!",
-            description: `Transaction ID: ${transactionData.mpesa_receipt_number || checkoutRequestID}`,
-          });
-          onSuccess?.(transactionData.mpesa_receipt_number || checkoutRequestID);
-        } else if (transactionData.status === 'failed') {
-          setIsProcessing(false);
-          toast({
-            title: "Payment Failed",
-            description: "The payment was not completed. Please try again.",
-            variant: "destructive"
-          });
-          onError?.("Payment failed");
-        } else {
-          // Still pending, continue polling
-          attempts++;
-          if (attempts < maxAttempts) {
-            setTimeout(poll, 10000);
-          } else {
+          if (dbError || !transactionData) {
+            attempts++;
+            if (attempts < maxAttempts) {
+              setTimeout(poll, 10000);
+            } else {
+              setIsProcessing(false);
+              toast({
+                title: "Payment Timeout",
+                description: "Payment verification timed out. Please check your transaction history.",
+                variant: "destructive"
+              });
+            }
+            return;
+          }
+
+          if (transactionData.status === 'completed') {
             setIsProcessing(false);
             toast({
-              title: "Payment Timeout",
-              description: "Payment verification timed out. Please check your transaction history.",
+              title: "Payment Successful!",
+              description: `Transaction ID: ${transactionData.mpesa_receipt_number || checkoutRequestID}`,
+            });
+            onSuccess?.(transactionData.mpesa_receipt_number || checkoutRequestID);
+          } else if (transactionData.status === 'failed') {
+            setIsProcessing(false);
+            toast({
+              title: "Payment Failed",
+              description: "The payment was not completed. Please try again.",
               variant: "destructive"
             });
+            onError?.("Payment failed");
+          } else {
+            // Still pending, continue polling
+            attempts++;
+            if (attempts < maxAttempts) {
+              setTimeout(poll, 10000);
+            } else {
+              setIsProcessing(false);
+              toast({
+                title: "Payment Timeout",
+                description: "Payment verification timed out. Please check your transaction history.",
+                variant: "destructive"
+              });
+            }
           }
         }
       } catch (error) {

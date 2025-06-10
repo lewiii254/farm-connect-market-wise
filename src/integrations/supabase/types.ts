@@ -182,9 +182,11 @@ export type Database = {
           created_at: string | null
           description: string | null
           id: string
+          mpesa_receipt_number: string | null
           phone_number: string
           reference: string | null
           status: string | null
+          transaction_date: string | null
           transaction_id: string
           transaction_type: string | null
           updated_at: string | null
@@ -195,9 +197,11 @@ export type Database = {
           created_at?: string | null
           description?: string | null
           id?: string
+          mpesa_receipt_number?: string | null
           phone_number: string
           reference?: string | null
           status?: string | null
+          transaction_date?: string | null
           transaction_id: string
           transaction_type?: string | null
           updated_at?: string | null
@@ -208,9 +212,11 @@ export type Database = {
           created_at?: string | null
           description?: string | null
           id?: string
+          mpesa_receipt_number?: string | null
           phone_number?: string
           reference?: string | null
           status?: string | null
+          transaction_date?: string | null
           transaction_id?: string
           transaction_type?: string | null
           updated_at?: string | null

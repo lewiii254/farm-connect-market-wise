@@ -25,6 +25,22 @@ interface MpesaPaymentProps {
   accountReference?: string;
 }
 
+interface MpesaTransactionData {
+  id: string;
+  transaction_id: string;
+  phone_number: string;
+  amount: number;
+  status: string;
+  mpesa_receipt_number?: string;
+  transaction_date?: string;
+  created_at: string;
+  updated_at: string;
+  user_id?: string;
+  reference?: string;
+  description?: string;
+  transaction_type?: string;
+}
+
 export const MpesaPayment = ({ 
   amount, 
   onSuccess, 
@@ -95,20 +111,17 @@ export const MpesaPayment = ({
 
     const poll = async () => {
       try {
-        // Use the Supabase client to call the mpesa-status function directly
-        const { data, error } = await supabase.functions.invoke('mpesa-status', {
-          method: 'GET',
-          body: {},
-          headers: {
-            'Content-Type': 'application/json'
-          }
-        });
+        // Try to get transaction data from database directly
+        const { data: transactionData, error: dbError } = await supabase
+          .from('mpesa_transactions')
+          .select('*')
+          .eq('transaction_id', checkoutRequestID)
+          .single();
 
-        if (error) {
-          console.error('Status check error:', error);
+        if (dbError || !transactionData) {
           attempts++;
           if (attempts < maxAttempts) {
-            setTimeout(poll, 10000); // Poll every 10 seconds
+            setTimeout(poll, 10000);
           } else {
             setIsProcessing(false);
             toast({
@@ -120,62 +133,35 @@ export const MpesaPayment = ({
           return;
         }
 
-        // Check transaction status by calling the edge function with query parameter
-        const statusResponse = await supabase.functions.invoke('mpesa-status', {
-          method: 'GET'
-        });
-        
-        if (statusResponse.error) {
-          // Try to get transaction data from database directly
-          const { data: transactionData, error: dbError } = await supabase
-            .from('mpesa_transactions')
-            .select('*')
-            .eq('transaction_id', checkoutRequestID)
-            .single();
+        const transaction = transactionData as MpesaTransactionData;
 
-          if (dbError || !transactionData) {
-            attempts++;
-            if (attempts < maxAttempts) {
-              setTimeout(poll, 10000);
-            } else {
-              setIsProcessing(false);
-              toast({
-                title: "Payment Timeout",
-                description: "Payment verification timed out. Please check your transaction history.",
-                variant: "destructive"
-              });
-            }
-            return;
-          }
-
-          if (transactionData.status === 'completed') {
+        if (transaction.status === 'completed') {
+          setIsProcessing(false);
+          toast({
+            title: "Payment Successful!",
+            description: `Transaction ID: ${transaction.mpesa_receipt_number || checkoutRequestID}`,
+          });
+          onSuccess?.(transaction.mpesa_receipt_number || checkoutRequestID);
+        } else if (transaction.status === 'failed') {
+          setIsProcessing(false);
+          toast({
+            title: "Payment Failed",
+            description: "The payment was not completed. Please try again.",
+            variant: "destructive"
+          });
+          onError?.("Payment failed");
+        } else {
+          // Still pending, continue polling
+          attempts++;
+          if (attempts < maxAttempts) {
+            setTimeout(poll, 10000);
+          } else {
             setIsProcessing(false);
             toast({
-              title: "Payment Successful!",
-              description: `Transaction ID: ${transactionData.mpesa_receipt_number || checkoutRequestID}`,
-            });
-            onSuccess?.(transactionData.mpesa_receipt_number || checkoutRequestID);
-          } else if (transactionData.status === 'failed') {
-            setIsProcessing(false);
-            toast({
-              title: "Payment Failed",
-              description: "The payment was not completed. Please try again.",
+              title: "Payment Timeout",
+              description: "Payment verification timed out. Please check your transaction history.",
               variant: "destructive"
             });
-            onError?.("Payment failed");
-          } else {
-            // Still pending, continue polling
-            attempts++;
-            if (attempts < maxAttempts) {
-              setTimeout(poll, 10000);
-            } else {
-              setIsProcessing(false);
-              toast({
-                title: "Payment Timeout",
-                description: "Payment verification timed out. Please check your transaction history.",
-                variant: "destructive"
-              });
-            }
           }
         }
       } catch (error) {

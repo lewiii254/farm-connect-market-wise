@@ -1,10 +1,10 @@
-
 import React, { useState } from 'react';
 import Navigation from '@/components/Navigation';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { 
   CreditCard, 
   Smartphone, 
@@ -20,6 +20,7 @@ import {
   Droplets
 } from 'lucide-react';
 import { MpesaPayment, SafaricomServices } from '@/components/MpesaIntegration';
+import { MpesaServicePayment, LoanApplicationForm } from '@/components/MpesaServiceIntegration';
 
 const FinancialServices = () => {
   const [selectedLoan, setSelectedLoan] = useState<number | null>(null);
@@ -32,7 +33,8 @@ const FinancialServices = () => {
       term: "6-12 months",
       features: ["No collateral required", "Quick approval", "M-Pesa disbursement"],
       description: "Perfect for seed purchase, fertilizers, and seasonal farming inputs",
-      icon: Sprout
+      icon: Sprout,
+      applicationFee: 500
     },
     {
       name: "Farm Equipment Financing",
@@ -41,7 +43,8 @@ const FinancialServices = () => {
       term: "12-36 months",
       features: ["Asset-backed", "Flexible payments", "Insurance included"],
       description: "Finance tractors, irrigation systems, and modern farming equipment",
-      icon: Tractor
+      icon: Tractor,
+      applicationFee: 1000
     },
     {
       name: "Emergency Farm Fund",
@@ -50,7 +53,49 @@ const FinancialServices = () => {
       term: "3-6 months",
       features: ["Instant approval", "Same-day disbursement", "Pay via M-Pesa"],
       description: "Quick access to funds for pest control, drought mitigation, or urgent repairs",
-      icon: Shield
+      icon: Shield,
+      applicationFee: 250
+    }
+  ];
+
+  const savingsProducts = [
+    {
+      name: "Farm Income Savings",
+      rate: "4.5% p.a.",
+      minAmount: 1000,
+      description: "Save your harvest income and earn interest",
+      features: ["Monthly interest", "M-Pesa access", "No lock-in period"]
+    },
+    {
+      name: "Seasonal Investment Plan",
+      rate: "8-12% p.a.",
+      minAmount: 5000,
+      description: "Investment plan aligned with farming cycles",
+      features: ["Quarterly returns", "Flexible deposits", "Agricultural bonds"]
+    }
+  ];
+
+  const insuranceProducts = [
+    {
+      name: "Crop Weather Insurance",
+      price: 500,
+      coverage: "Per acre",
+      description: "Protection against drought, floods, and hailstorms",
+      benefits: ["Satellite monitoring", "Quick claims", "M-Pesa payouts"]
+    },
+    {
+      name: "Farm Equipment Protection",
+      price: 1000,
+      coverage: "Per month",
+      description: "Comprehensive equipment and machinery protection",
+      benefits: ["Theft coverage", "Breakdown protection", "Rural area coverage"]
+    },
+    {
+      name: "Farmer Family Health Cover",
+      price: 2500,
+      coverage: "Per year",
+      description: "Healthcare for farming families and workers",
+      benefits: ["Rural clinic access", "Emergency care", "Maternity benefits"]
     }
   ];
 
@@ -109,6 +154,10 @@ const FinancialServices = () => {
                           <span className="text-sm text-gray-500">Repayment:</span>
                           <span className="font-medium">{loan.term}</span>
                         </div>
+                        <div className="flex justify-between">
+                          <span className="text-sm text-gray-500">Application Fee:</span>
+                          <span className="font-medium">KSh {loan.applicationFee}</span>
+                        </div>
                         <div className="space-y-2">
                           {loan.features.map((feature, idx) => (
                             <Badge key={idx} variant="secondary" className="text-xs">
@@ -116,9 +165,23 @@ const FinancialServices = () => {
                             </Badge>
                           ))}
                         </div>
-                        <Button className="w-full mt-4 bg-green-600 hover:bg-green-700">
-                          Apply Now
-                        </Button>
+                        
+                        <Dialog>
+                          <DialogTrigger asChild>
+                            <Button className="w-full mt-4 bg-green-600 hover:bg-green-700">
+                              Apply Now via M-Pesa
+                            </Button>
+                          </DialogTrigger>
+                          <DialogContent className="sm:max-w-2xl">
+                            <DialogHeader>
+                              <DialogTitle>Apply for {loan.name}</DialogTitle>
+                              <DialogDescription>
+                                Complete your application and pay the processing fee via M-Pesa
+                              </DialogDescription>
+                            </DialogHeader>
+                            <LoanApplicationForm loanProduct={loan} />
+                          </DialogContent>
+                        </Dialog>
                       </div>
                     </CardContent>
                   </Card>
@@ -147,6 +210,102 @@ const FinancialServices = () => {
                         <Badge variant="outline">{partner.logo}</Badge>
                       </div>
                     ))}
+                  </div>
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            <TabsContent value="savings" className="space-y-8">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                {savingsProducts.map((product, index) => (
+                  <Card key={index}>
+                    <CardHeader>
+                      <CardTitle className="flex items-center gap-2">
+                        <PiggyBank className="h-5 w-5 text-blue-600" />
+                        {product.name}
+                      </CardTitle>
+                      <CardDescription>{product.description}</CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="space-y-4">
+                        <div className="text-center p-4 bg-blue-50 rounded-lg">
+                          <div className="text-2xl font-bold text-blue-700">{product.rate}</div>
+                          <div className="text-sm text-blue-600">Interest Rate</div>
+                        </div>
+                        <ul className="space-y-2 text-sm">
+                          {product.features.map((feature, idx) => (
+                            <li key={idx}>• {feature}</li>
+                          ))}
+                        </ul>
+                        <MpesaServicePayment
+                          serviceName={`${product.name} - Initial Deposit`}
+                          amount={product.minAmount}
+                          description={`Open ${product.name} account with minimum deposit`}
+                          buttonText={`Open Account - Min KSh ${product.minAmount.toLocaleString()}`}
+                          buttonVariant="outline"
+                        />
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            </TabsContent>
+
+            <TabsContent value="insurance" className="space-y-8">
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                {insuranceProducts.map((product, index) => (
+                  <Card key={index}>
+                    <CardHeader>
+                      <CardTitle className="flex items-center gap-2">
+                        <Shield className="h-5 w-5 text-blue-500" />
+                        {product.name}
+                      </CardTitle>
+                      <CardDescription>{product.description}</CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="space-y-3">
+                        <div className="text-lg font-semibold text-green-600">
+                          From KSh {product.price} {product.coverage}
+                        </div>
+                        <ul className="text-sm space-y-1">
+                          {product.benefits.map((benefit, idx) => (
+                            <li key={idx}>• {benefit}</li>
+                          ))}
+                        </ul>
+                        <MpesaServicePayment
+                          serviceName={`${product.name} Premium`}
+                          amount={product.price}
+                          description={`Subscribe to ${product.name} coverage`}
+                          buttonText={`Subscribe - KSh ${product.price}`}
+                          buttonVariant="outline"
+                        />
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+
+              <Card className="bg-green-50 border-green-200">
+                <CardHeader>
+                  <CardTitle className="text-green-800">🌾 FarmConnect Insurance Partnership</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-green-700 mb-4">
+                    Partner with leading agricultural insurers in Kenya to provide comprehensive coverage tailored for modern farming needs. All premiums can be paid via M-Pesa with flexible payment schedules aligned to your harvest cycles.
+                  </p>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div className="text-center p-3 bg-white rounded border">
+                      <div className="font-bold text-green-800">95%</div>
+                      <div className="text-sm text-green-600">Claims Settled</div>
+                    </div>
+                    <div className="text-center p-3 bg-white rounded border">
+                      <div className="font-bold text-green-800">48 Hours</div>
+                      <div className="text-sm text-green-600">Average Claim Time</div>
+                    </div>
+                    <div className="text-center p-3 bg-white rounded border">
+                      <div className="font-bold text-green-800">KSh 150M+</div>
+                      <div className="text-sm text-green-600">Claims Paid Out</div>
+                    </div>
                   </div>
                 </CardContent>
               </Card>
@@ -231,174 +390,6 @@ const FinancialServices = () => {
                           Transaction history tracking
                         </li>
                       </ul>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            </TabsContent>
-
-            <TabsContent value="savings" className="space-y-8">
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <PiggyBank className="h-5 w-5 text-blue-600" />
-                      Farm Income Savings (M-Shwari)
-                    </CardTitle>
-                    <CardDescription>
-                      Save your harvest income and earn interest - perfect for planning next season's investments
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-4">
-                      <div className="text-center p-4 bg-blue-50 rounded-lg">
-                        <div className="text-2xl font-bold text-blue-700">4.5% p.a.</div>
-                        <div className="text-sm text-blue-600">Interest Rate on Farm Savings</div>
-                      </div>
-                      <ul className="space-y-2 text-sm">
-                        <li>• Save harvest proceeds for next season</li>
-                        <li>• Access via M-Pesa for easy deposits</li>
-                        <li>• Monthly interest payments</li>
-                        <li>• Lock savings for higher rates during off-season</li>
-                        <li>• Emergency withdrawal for farm needs</li>
-                      </ul>
-                      <Button className="w-full bg-blue-600 hover:bg-blue-700">
-                        Open Farm Savings Account
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
-
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <TrendingUp className="h-5 w-5 text-green-600" />
-                      Agricultural Investment Plans
-                    </CardTitle>
-                    <CardDescription>
-                      Grow your farm wealth with agriculture-focused investment options
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-4">
-                      <div className="space-y-3">
-                        <div className="flex justify-between items-center p-3 border rounded">
-                          <span>Agricultural Bonds</span>
-                          <span className="text-green-600 font-medium">8-12%</span>
-                        </div>
-                        <div className="flex justify-between items-center p-3 border rounded">
-                          <span>Farm Development Treasury Bills</span>
-                          <span className="text-green-600 font-medium">6-8%</span>
-                        </div>
-                        <div className="flex justify-between items-center p-3 border rounded">
-                          <span>Agricultural Money Market</span>
-                          <span className="text-green-600 font-medium">7-10%</span>
-                        </div>
-                      </div>
-                      <div className="text-xs text-gray-600 p-3 bg-green-50 rounded">
-                        💡 Tip: Invest during harvest season for maximum returns before next planting cycle
-                      </div>
-                      <Button variant="outline" className="w-full">
-                        Explore Farm Investments
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
-              </div>
-            </TabsContent>
-
-            <TabsContent value="insurance" className="space-y-8">
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <Droplets className="h-5 w-5 text-blue-500" />
-                      Crop Weather Insurance
-                    </CardTitle>
-                    <CardDescription>Protect your harvest from climate risks</CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-3">
-                      <div className="text-lg font-semibold text-green-600">From KSh 500/acre</div>
-                      <ul className="text-sm space-y-1">
-                        <li>• Drought coverage for all crops</li>
-                        <li>• Flood protection during rainy season</li>
-                        <li>• Hailstorm damage compensation</li>
-                        <li>• Quick M-Pesa claims settlement</li>
-                        <li>• Satellite weather monitoring</li>
-                      </ul>
-                      <Button className="w-full">Get Farm Quote</Button>
-                    </div>
-                  </CardContent>
-                </Card>
-
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <Tractor className="h-5 w-5 text-orange-500" />
-                      Farm Equipment Protection
-                    </CardTitle>
-                    <CardDescription>Secure your farming investments and tools</CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-3">
-                      <div className="text-lg font-semibold text-blue-600">From KSh 1,000/month</div>
-                      <ul className="text-sm space-y-1">
-                        <li>• Tractors & machinery coverage</li>
-                        <li>• Irrigation equipment protection</li>
-                        <li>• Tools & implement insurance</li>
-                        <li>• Theft protection in rural areas</li>
-                        <li>• Breakdown & repair coverage</li>
-                      </ul>
-                      <Button variant="outline" className="w-full">Protect Equipment</Button>
-                    </div>
-                  </CardContent>
-                </Card>
-
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <Shield className="h-5 w-5 text-green-500" />
-                      Farmer Family Health Cover
-                    </CardTitle>
-                    <CardDescription>Healthcare for farming families and workers</CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-3">
-                      <div className="text-lg font-semibold text-purple-600">From KSh 2,500/year</div>
-                      <ul className="text-sm space-y-1">
-                        <li>• Rural clinic access</li>
-                        <li>• Emergency medical care</li>
-                        <li>• Maternity benefits for farm families</li>
-                        <li>• Seasonal worker coverage</li>
-                        <li>• Agricultural accident protection</li>
-                      </ul>
-                      <Button variant="outline" className="w-full">Enroll Family</Button>
-                    </div>
-                  </CardContent>
-                </Card>
-              </div>
-
-              <Card className="bg-green-50 border-green-200">
-                <CardHeader>
-                  <CardTitle className="text-green-800">🌾 FarmConnect Insurance Partnership</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-green-700 mb-4">
-                    Partner with leading agricultural insurers in Kenya to provide comprehensive coverage tailored for modern farming needs. All premiums can be paid via M-Pesa with flexible payment schedules aligned to your harvest cycles.
-                  </p>
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div className="text-center p-3 bg-white rounded border">
-                      <div className="font-bold text-green-800">95%</div>
-                      <div className="text-sm text-green-600">Claims Settled</div>
-                    </div>
-                    <div className="text-center p-3 bg-white rounded border">
-                      <div className="font-bold text-green-800">48 Hours</div>
-                      <div className="text-sm text-green-600">Average Claim Time</div>
-                    </div>
-                    <div className="text-center p-3 bg-white rounded border">
-                      <div className="font-bold text-green-800">KSh 150M+</div>
-                      <div className="text-sm text-green-600">Claims Paid Out</div>
                     </div>
                   </div>
                 </CardContent>

@@ -239,29 +239,30 @@ const BuyerProfile = () => {
   const renderSafeSelectItems = (items: string[], labelTransform?: (item: string) => string) => {
     console.log('Rendering SelectItems for items:', items);
     
-    return items
-      .filter(item => {
-        const isValid = isValidSelectValue(item);
-        if (!isValid) {
-          console.error('FILTERED OUT invalid item for SelectItem:', item, typeof item);
-        }
-        return isValid;
-      })
-      .map((item) => {
-        // Final safety check before creating SelectItem
-        if (!isValidSelectValue(item)) {
-          console.error('CRITICAL: Invalid item passed SelectItem validation:', item);
-          return null;
-        }
-        
-        console.log('Creating SelectItem with value:', item);
-        return (
-          <SelectItem key={item} value={item}>
-            {labelTransform ? labelTransform(item) : item}
-          </SelectItem>
-        );
-      })
-      .filter(Boolean); // Remove any null items
+    const validItems = items.filter(item => {
+      const isValid = isValidSelectValue(item);
+      if (!isValid) {
+        console.error('FILTERED OUT invalid item for SelectItem:', item, typeof item);
+      }
+      return isValid;
+    });
+
+    console.log('Valid items after filtering:', validItems);
+    
+    return validItems.map((item) => {
+      // Final safety check before creating SelectItem
+      if (!isValidSelectValue(item)) {
+        console.error('CRITICAL: Invalid item passed SelectItem validation:', item);
+        return null;
+      }
+      
+      console.log('Creating SelectItem with value:', item);
+      return (
+        <SelectItem key={item} value={item}>
+          {labelTransform ? labelTransform(item) : item}
+        </SelectItem>
+      );
+    }).filter(Boolean); // Remove any null items
   };
 
   if (isLoading) {
@@ -329,11 +330,7 @@ const BuyerProfile = () => {
                     <SelectValue placeholder="Select business type" />
                   </SelectTrigger>
                   <SelectContent>
-                    {BUSINESS_TYPES.filter(isValidSelectValue).map((type) => (
-                      <SelectItem key={type} value={type}>
-                        {type.charAt(0).toUpperCase() + type.slice(1)}
-                      </SelectItem>
-                    ))}
+                    {renderSafeSelectItems(BUSINESS_TYPES, (type) => type.charAt(0).toUpperCase() + type.slice(1))}
                   </SelectContent>
                 </Select>
               </div>
@@ -353,11 +350,7 @@ const BuyerProfile = () => {
                     <SelectValue placeholder="Select location" />
                   </SelectTrigger>
                   <SelectContent>
-                    {KENYAN_COUNTIES.filter(isValidSelectValue).map((county) => (
-                      <SelectItem key={county} value={county}>
-                        {county}
-                      </SelectItem>
-                    ))}
+                    {renderSafeSelectItems(KENYAN_COUNTIES)}
                   </SelectContent>
                 </Select>
               </div>

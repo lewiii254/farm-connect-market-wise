@@ -1,6 +1,7 @@
 
 # 🌾 FarmConnect Kenya 🇰🇪
 
+
 <div align="center">
    
 ### 🚀 Empowering Kenyan Farmers Through Digital Innovation 🌱

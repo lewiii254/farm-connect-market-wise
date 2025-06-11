@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -14,20 +13,12 @@ export const UserProfile = () => {
 
   const handleSignOut = async () => {
     try {
-      const { error } = await signOut();
-      if (error) {
-        toast({
-          title: "Sign Out Failed",
-          description: error.message,
-          variant: "destructive"
-        });
-      } else {
-        toast({
-          title: "Signed Out",
-          description: "You have been successfully signed out."
-        });
-        navigate('/auth');
-      }
+      await signOut();
+      toast({
+        title: "Signed Out",
+        description: "You have been successfully signed out."
+      });
+      navigate('/auth');
     } catch (error) {
       toast({
         title: "Sign Out Failed",

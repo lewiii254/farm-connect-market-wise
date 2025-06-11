@@ -26,7 +26,7 @@ interface CropListing {
   created_at: string;
 }
 
-const CropListings = ({ key }: { key?: number }) => {
+const CropListings = () => {
   const [listings, setListings] = useState<CropListing[]>([]);
   const [filteredListings, setFilteredListings] = useState<CropListing[]>([]);
   const [loading, setLoading] = useState(true);
@@ -37,7 +37,7 @@ const CropListings = ({ key }: { key?: number }) => {
 
   useEffect(() => {
     fetchListings();
-  }, [key]);
+  }, []);
 
   useEffect(() => {
     filterListings();
@@ -75,11 +75,11 @@ const CropListings = ({ key }: { key?: number }) => {
       );
     }
 
-    if (locationFilter) {
+    if (locationFilter && locationFilter !== 'all-locations') {
       filtered = filtered.filter(listing => listing.location === locationFilter);
     }
 
-    if (cropFilter) {
+    if (cropFilter && cropFilter !== 'all-crops') {
       filtered = filtered.filter(listing => listing.crop_name === cropFilter);
     }
 
@@ -92,7 +92,6 @@ const CropListings = ({ key }: { key?: number }) => {
     setFilteredListings(filtered);
   };
 
-  // Safe helper to filter out empty or invalid values
   const getSafeSelectValue = (value: string): string | undefined => {
     if (!value || typeof value !== 'string' || value.trim() === '') {
       return undefined;
@@ -100,12 +99,11 @@ const CropListings = ({ key }: { key?: number }) => {
     return value;
   };
 
-  // Safe SelectItem renderer
   const renderSafeSelectItems = (items: string[]) => {
     return items
       .filter(item => item && typeof item === 'string' && item.trim().length > 0)
       .map((item) => (
-        <SelectItem key={`select-item-${item}`} value={item}>
+        <SelectItem key={item} value={item}>
           {item}
         </SelectItem>
       ));

@@ -5,12 +5,17 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import CropListings from '@/components/marketplace/CropListings';
 import BuyerProfile from '@/components/marketplace/BuyerProfile';
 import CropListingForm from '@/components/marketplace/CropListingForm';
-import { Package, Plus, User, ShoppingCart, TrendingUp, Users } from 'lucide-react';
+import { SeedCropsButton } from '@/components/marketplace/SeedCropsButton';
+import { Package, Plus, User, ShoppingCart, TrendingUp, Users, Leaf } from 'lucide-react';
 
 const Buyers = () => {
   const [refreshKey, setRefreshKey] = useState(0);
 
   const handleListingSuccess = () => {
+    setRefreshKey(prev => prev + 1);
+  };
+
+  const handleSeedSuccess = () => {
     setRefreshKey(prev => prev + 1);
   };
 
@@ -33,7 +38,7 @@ const Buyers = () => {
               <div className="mb-6 lg:mb-0">
                 <h1 className="text-3xl font-bold mb-2">Agricultural Marketplace</h1>
                 <p className="text-green-100 text-lg max-w-2xl">
-                  Connect with farmers and buyers across Kenya. Buy fresh produce directly from farms or sell your crops to verified buyers.
+                  Connect with farmers and buyers across Kenya. Buy fresh produce directly from farms or sell your crops to verified buyers with secure M-Pesa payments.
                 </p>
               </div>
               <div className="flex flex-col space-y-4">
@@ -41,6 +46,10 @@ const Buyers = () => {
                   <div className="text-sm text-green-100">Today's Featured</div>
                   <div className="text-xl font-bold">Fresh Maize</div>
                   <div className="text-sm text-green-200">KSh 45/kg • Nakuru</div>
+                </div>
+                <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4">
+                  <div className="text-sm text-green-100">Quick Demo</div>
+                  <SeedCropsButton onSuccess={handleSeedSuccess} />
                 </div>
               </div>
             </div>
@@ -62,6 +71,40 @@ const Buyers = () => {
               </div>
             </div>
           ))}
+        </div>
+
+        {/* Features Highlight */}
+        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 mb-8">
+          <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+            <Leaf className="h-5 w-5 text-green-600" />
+            Marketplace Features
+          </h3>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+            <div className="flex items-center gap-2">
+              <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+              <span>Secure M-Pesa STK Push payments</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+              <span>Direct farmer-to-buyer connections</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
+              <span>Real-time crop availability</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="w-2 h-2 bg-orange-500 rounded-full"></div>
+              <span>Quality assured organic options</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="w-2 h-2 bg-red-500 rounded-full"></div>
+              <span>Delivery coordination support</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="w-2 h-2 bg-teal-500 rounded-full"></div>
+              <span>Fair pricing for all parties</span>
+            </div>
+          </div>
         </div>
 
         {/* Main Content Tabs */}

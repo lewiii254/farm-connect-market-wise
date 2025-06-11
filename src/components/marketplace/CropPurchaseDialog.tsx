@@ -5,9 +5,10 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
-import { ShoppingCart, MapPin, Calendar, Truck } from 'lucide-react';
+import { ShoppingCart, MapPin, Calendar, Truck, Phone } from 'lucide-react';
 import { MpesaServicePayment } from '@/components/MpesaServiceIntegration';
 import { toast } from "@/hooks/use-toast";
+import { supabase } from '@/integrations/supabase/client';
 
 interface CropListing {
   id: string;
@@ -31,18 +32,63 @@ export const CropPurchaseDialog = ({ listing, trigger }: CropPurchaseDialogProps
     quantity: 1,
     deliveryLocation: '',
     deliveryDate: '',
-    notes: ''
+    notes: '',
+    buyerPhone: ''
   });
 
   const totalAmount = purchaseData.quantity * listing.price_per_kg;
 
-  const handleSuccessfulPurchase = (transactionId: string) => {
-    toast({
-      title: "Purchase Successful!",
-      description: `Your order for ${purchaseData.quantity}kg of ${listing.crop_name} has been placed successfully.`,
-    });
+  const handleSuccessfulPurchase = async (transactionId: string) => {
+    try {
+      // Create order record in database
+      const orderData = {
+        listing_id: listing.id,
+        farmer_id: listing.farmer_id,
+        buyer_id: null, // Will be set if user is authenticated
+        quantity_kg: purchaseData.quantity,
+        total_amount: totalAmount,
+        delivery_location: purchaseData.deliveryLocation,
+        delivery_date: purchaseData.deliveryDate || null,
+        notes: purchaseData.notes || null,
+        mpesa_transaction_id: transactionId,
+        status: 'confirmed',
+        payment_status: 'completed',
+        payment_method: 'mpesa'
+      };
+
+      const { error } = await supabase
+        .from('orders')
+        .insert(orderData);
+
+      if (error) {
+        console.error('Order creation error:', error);
+        toast({
+          title: "Payment Successful",
+          description: `Your M-Pesa payment was successful! Transaction ID: ${transactionId}. Please contact the farmer directly.`,
+        });
+      } else {
+        toast({
+          title: "Purchase Successful!",
+          description: `Your order for ${purchaseData.quantity}kg of ${listing.crop_name} has been placed successfully. The farmer will contact you soon.`,
+        });
+      }
+    } catch (error) {
+      console.error('Error creating order:', error);
+      toast({
+        title: "Payment Successful",
+        description: `Your M-Pesa payment was successful! Transaction ID: ${transactionId}. Please contact the farmer directly.`,
+      });
+    }
+    
     setIsOpen(false);
-    // Here you would typically create the order in your database
+    // Reset form
+    setPurchaseData({
+      quantity: 1,
+      deliveryLocation: '',
+      deliveryDate: '',
+      notes: '',
+      buyerPhone: ''
+    });
   };
 
   const handlePurchaseError = (error: string) => {
@@ -53,12 +99,19 @@ export const CropPurchaseDialog = ({ listing, trigger }: CropPurchaseDialogProps
     });
   };
 
+  const isFormValid = () => {
+    return purchaseData.quantity > 0 && 
+           purchaseData.quantity <= listing.quantity_kg &&
+           purchaseData.deliveryLocation.trim() !== '' &&
+           purchaseData.buyerPhone.trim() !== '';
+  };
+
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
         {trigger}
       </DialogTrigger>
-      <DialogContent className="sm:max-w-lg">
+      <DialogContent className="sm:max-w-lg max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <ShoppingCart className="h-5 w-5 text-green-600" />
@@ -96,7 +149,7 @@ export const CropPurchaseDialog = ({ listing, trigger }: CropPurchaseDialogProps
           {/* Purchase Details */}
           <div className="space-y-3">
             <div>
-              <Label htmlFor="quantity">Quantity (kg)</Label>
+              <Label htmlFor="quantity">Quantity (kg) *</Label>
               <Input
                 id="quantity"
                 type="number"
@@ -105,13 +158,28 @@ export const CropPurchaseDialog = ({ listing, trigger }: CropPurchaseDialogProps
                 value={purchaseData.quantity}
                 onChange={(e) => setPurchaseData({
                   ...purchaseData, 
-                  quantity: Math.min(Number(e.target.value), listing.quantity_kg)
+                  quantity: Math.min(Number(e.target.value) || 1, listing.quantity_kg)
                 })}
               />
             </div>
 
             <div>
-              <Label htmlFor="deliveryLocation">Delivery Location</Label>
+              <Label htmlFor="buyerPhone">Your Phone Number *</Label>
+              <div className="relative">
+                <Phone className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                <Input
+                  id="buyerPhone"
+                  placeholder="254712345678"
+                  value={purchaseData.buyerPhone}
+                  onChange={(e) => setPurchaseData({...purchaseData, buyerPhone: e.target.value})}
+                  className="pl-10"
+                />
+              </div>
+              <p className="text-xs text-gray-500 mt-1">This will be used for M-Pesa payment and farmer contact</p>
+            </div>
+
+            <div>
+              <Label htmlFor="deliveryLocation">Delivery Location *</Label>
               <Input
                 id="deliveryLocation"
                 placeholder="Enter your delivery address"
@@ -127,6 +195,7 @@ export const CropPurchaseDialog = ({ listing, trigger }: CropPurchaseDialogProps
                 type="date"
                 value={purchaseData.deliveryDate}
                 onChange={(e) => setPurchaseData({...purchaseData, deliveryDate: e.target.value})}
+                min={new Date().toISOString().split('T')[0]}
               />
             </div>
 
@@ -134,7 +203,7 @@ export const CropPurchaseDialog = ({ listing, trigger }: CropPurchaseDialogProps
               <Label htmlFor="notes">Special Instructions (Optional)</Label>
               <Input
                 id="notes"
-                placeholder="Any special requests or notes"
+                placeholder="Any special requests or notes for the farmer"
                 value={purchaseData.notes}
                 onChange={(e) => setPurchaseData({...purchaseData, notes: e.target.value})}
               />
@@ -158,18 +227,24 @@ export const CropPurchaseDialog = ({ listing, trigger }: CropPurchaseDialogProps
           </div>
 
           {/* Payment Button */}
-          <MpesaServicePayment
-            serviceName="Crop Purchase"
-            amount={totalAmount}
-            description={`Purchase ${purchaseData.quantity}kg of ${listing.crop_name} from ${listing.location}`}
-            onSuccess={handleSuccessfulPurchase}
-            onError={handlePurchaseError}
-            buttonText={`Pay KSh ${totalAmount.toLocaleString()} via M-Pesa`}
-          />
+          {isFormValid() ? (
+            <MpesaServicePayment
+              serviceName="Crop Purchase"
+              amount={totalAmount}
+              description={`Purchase ${purchaseData.quantity}kg of ${listing.crop_name} from ${listing.location}`}
+              onSuccess={handleSuccessfulPurchase}
+              onError={handlePurchaseError}
+              buttonText={`Pay KSh ${totalAmount.toLocaleString()} via M-Pesa`}
+            />
+          ) : (
+            <Button disabled className="w-full">
+              Please fill in all required fields
+            </Button>
+          )}
 
           <div className="text-xs text-gray-500 text-center">
             <Truck className="h-3 w-3 inline mr-1" />
-            Delivery charges may apply based on location
+            Delivery charges may apply based on location. The farmer will contact you to arrange delivery.
           </div>
         </div>
       </DialogContent>

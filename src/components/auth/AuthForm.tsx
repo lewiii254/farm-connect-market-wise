@@ -4,56 +4,35 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Label } from '@/components/ui/label';
-import { Separator } from '@/components/ui/separator';
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
-import { Chrome, Leaf, Mail, Lock, User, Phone, MapPin } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { Loader2, Leaf } from 'lucide-react';
 
 export const AuthForm = () => {
   const [isLoading, setIsLoading] = useState(false);
-  const { signUp, signIn, signInWithGoogle } = useAuth();
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [fullName, setFullName] = useState('');
+  const { signIn, signUp, signInWithGoogle } = useAuth();
   const { toast } = useToast();
-  const navigate = useNavigate();
 
-  const [loginData, setLoginData] = useState({
-    email: '',
-    password: ''
-  });
-
-  const [signupData, setSignupData] = useState({
-    email: '',
-    password: '',
-    fullName: '',
-    phoneNumber: '',
-    county: ''
-  });
-
-  const handleLogin = async (e: React.FormEvent) => {
+  const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
 
     try {
-      const { error } = await signIn(loginData.email, loginData.password);
-      
+      const { error } = await signIn(email, password);
       if (error) {
         toast({
-          title: "Login Failed",
+          title: "Sign In Failed",
           description: error.message,
           variant: "destructive"
         });
-      } else {
-        toast({
-          title: "Welcome back!",
-          description: "You have successfully logged in."
-        });
-        navigate('/');
       }
     } catch (error) {
       toast({
-        title: "Login Failed",
-        description: "An unexpected error occurred.",
+        title: "Sign In Failed",
+        description: "An unexpected error occurred",
         variant: "destructive"
       });
     } finally {
@@ -61,41 +40,28 @@ export const AuthForm = () => {
     }
   };
 
-  const handleSignup = async (e: React.FormEvent) => {
+  const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
 
     try {
-      const { error } = await signUp(signupData.email, signupData.password, {
-        full_name: signupData.fullName,
-        phone_number: signupData.phoneNumber,
-        county: signupData.county
-      });
-      
+      const { error } = await signUp(email, password, { full_name: fullName });
       if (error) {
-        if (error.message.includes('already registered')) {
-          toast({
-            title: "Account Exists",
-            description: "This email is already registered. Please sign in instead.",
-            variant: "destructive"
-          });
-        } else {
-          toast({
-            title: "Signup Failed",
-            description: error.message,
-            variant: "destructive"
-          });
-        }
+        toast({
+          title: "Sign Up Failed",
+          description: error.message,
+          variant: "destructive"
+        });
       } else {
         toast({
-          title: "Account Created!",
+          title: "Sign Up Successful",
           description: "Please check your email to verify your account."
         });
       }
     } catch (error) {
       toast({
-        title: "Signup Failed",
-        description: "An unexpected error occurred.",
+        title: "Sign Up Failed",
+        description: "An unexpected error occurred",
         variant: "destructive"
       });
     } finally {
@@ -109,15 +75,15 @@ export const AuthForm = () => {
       const { error } = await signInWithGoogle();
       if (error) {
         toast({
-          title: "Google Sign-in Failed",
+          title: "Google Sign In Failed",
           description: error.message,
           variant: "destructive"
         });
       }
     } catch (error) {
       toast({
-        title: "Google Sign-in Failed",
-        description: "An unexpected error occurred.",
+        title: "Google Sign In Failed",
+        description: "An unexpected error occurred",
         variant: "destructive"
       });
     } finally {
@@ -127,159 +93,147 @@ export const AuthForm = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50 flex items-center justify-center p-4">
-      <Card className="w-full max-w-md">
-        <CardHeader className="text-center">
-          <div className="flex items-center justify-center gap-2 mb-4">
-            <Leaf className="h-8 w-8 text-green-600" />
-            <span className="text-2xl font-bold text-green-600">FarmConnect</span>
+      <div className="w-full max-w-md">
+        <div className="text-center mb-8">
+          <div className="flex justify-center mb-4">
+            <div className="bg-green-600 rounded-full p-3">
+              <Leaf className="h-8 w-8 text-white" />
+            </div>
           </div>
-          <CardTitle>Welcome to FarmConnect Kenya</CardTitle>
-          <CardDescription>
-            Connect with markets, buyers, and fellow farmers
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <Tabs defaultValue="login" className="space-y-4">
-            <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger value="login">Sign In</TabsTrigger>
-              <TabsTrigger value="signup">Sign Up</TabsTrigger>
-            </TabsList>
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">FarmConnect</h1>
+          <p className="text-gray-600">Connect farmers and buyers across Kenya</p>
+        </div>
 
-            <TabsContent value="login" className="space-y-4">
-              <form onSubmit={handleLogin} className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="login-email">Email</Label>
-                  <div className="relative">
-                    <Mail className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+        <Card>
+          <CardHeader>
+            <CardTitle>Welcome</CardTitle>
+            <CardDescription>
+              Sign in to your account or create a new one to get started
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Tabs defaultValue="signin" className="w-full">
+              <TabsList className="grid w-full grid-cols-2">
+                <TabsTrigger value="signin">Sign In</TabsTrigger>
+                <TabsTrigger value="signup">Sign Up</TabsTrigger>
+              </TabsList>
+              
+              <TabsContent value="signin">
+                <form onSubmit={handleSignIn} className="space-y-4">
+                  <div className="space-y-2">
+                    <label htmlFor="signin-email" className="text-sm font-medium">
+                      Email
+                    </label>
                     <Input
-                      id="login-email"
+                      id="signin-email"
                       type="email"
-                      placeholder="farmer@example.com"
-                      className="pl-10"
-                      value={loginData.email}
-                      onChange={(e) => setLoginData({ ...loginData, email: e.target.value })}
+                      placeholder="your.email@example.com"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
                       required
                     />
                   </div>
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="login-password">Password</Label>
-                  <div className="relative">
-                    <Lock className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                  <div className="space-y-2">
+                    <label htmlFor="signin-password" className="text-sm font-medium">
+                      Password
+                    </label>
                     <Input
-                      id="login-password"
+                      id="signin-password"
                       type="password"
-                      placeholder="Enter your password"
-                      className="pl-10"
-                      value={loginData.password}
-                      onChange={(e) => setLoginData({ ...loginData, password: e.target.value })}
+                      placeholder="Your password"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
                       required
                     />
                   </div>
-                </div>
-                <Button type="submit" className="w-full" disabled={isLoading}>
-                  {isLoading ? "Signing in..." : "Sign In"}
-                </Button>
-              </form>
-            </TabsContent>
-
-            <TabsContent value="signup" className="space-y-4">
-              <form onSubmit={handleSignup} className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="signup-name">Full Name</Label>
-                  <div className="relative">
-                    <User className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                  <Button
+                    type="submit"
+                    className="w-full"
+                    disabled={isLoading}
+                  >
+                    {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                    Sign In
+                  </Button>
+                </form>
+              </TabsContent>
+              
+              <TabsContent value="signup">
+                <form onSubmit={handleSignUp} className="space-y-4">
+                  <div className="space-y-2">
+                    <label htmlFor="signup-name" className="text-sm font-medium">
+                      Full Name
+                    </label>
                     <Input
                       id="signup-name"
+                      type="text"
                       placeholder="John Doe"
-                      className="pl-10"
-                      value={signupData.fullName}
-                      onChange={(e) => setSignupData({ ...signupData, fullName: e.target.value })}
+                      value={fullName}
+                      onChange={(e) => setFullName(e.target.value)}
                       required
                     />
                   </div>
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="signup-email">Email</Label>
-                  <div className="relative">
-                    <Mail className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                  <div className="space-y-2">
+                    <label htmlFor="signup-email" className="text-sm font-medium">
+                      Email
+                    </label>
                     <Input
                       id="signup-email"
                       type="email"
-                      placeholder="farmer@example.com"
-                      className="pl-10"
-                      value={signupData.email}
-                      onChange={(e) => setSignupData({ ...signupData, email: e.target.value })}
+                      placeholder="your.email@example.com"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
                       required
                     />
                   </div>
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="signup-phone">Phone Number</Label>
-                  <div className="relative">
-                    <Phone className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-                    <Input
-                      id="signup-phone"
-                      placeholder="+254 700 123 456"
-                      className="pl-10"
-                      value={signupData.phoneNumber}
-                      onChange={(e) => setSignupData({ ...signupData, phoneNumber: e.target.value })}
-                    />
-                  </div>
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="signup-county">County</Label>
-                  <div className="relative">
-                    <MapPin className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-                    <Input
-                      id="signup-county"
-                      placeholder="e.g., Kiambu, Nakuru, Meru"
-                      className="pl-10"
-                      value={signupData.county}
-                      onChange={(e) => setSignupData({ ...signupData, county: e.target.value })}
-                    />
-                  </div>
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="signup-password">Password</Label>
-                  <div className="relative">
-                    <Lock className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                  <div className="space-y-2">
+                    <label htmlFor="signup-password" className="text-sm font-medium">
+                      Password
+                    </label>
                     <Input
                       id="signup-password"
                       type="password"
-                      placeholder="Create a secure password"
-                      className="pl-10"
-                      value={signupData.password}
-                      onChange={(e) => setSignupData({ ...signupData, password: e.target.value })}
+                      placeholder="Create a password"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
                       required
                     />
                   </div>
+                  <Button
+                    type="submit"
+                    className="w-full"
+                    disabled={isLoading}
+                  >
+                    {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                    Sign Up
+                  </Button>
+                </form>
+              </TabsContent>
+            </Tabs>
+
+            <div className="mt-6">
+              <div className="relative">
+                <div className="absolute inset-0 flex items-center">
+                  <span className="w-full border-t" />
                 </div>
-                <Button type="submit" className="w-full" disabled={isLoading}>
-                  {isLoading ? "Creating account..." : "Create Account"}
-                </Button>
-              </form>
-            </TabsContent>
-          </Tabs>
-
-          <div className="relative my-6">
-            <Separator />
-            <div className="absolute inset-0 flex items-center justify-center">
-              <span className="bg-white px-2 text-sm text-gray-500">or</span>
+                <div className="relative flex justify-center text-xs uppercase">
+                  <span className="bg-background px-2 text-muted-foreground">
+                    Or continue with
+                  </span>
+                </div>
+              </div>
+              <Button
+                variant="outline"
+                onClick={handleGoogleSignIn}
+                className="w-full mt-4"
+                disabled={isLoading}
+              >
+                {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                Google
+              </Button>
             </div>
-          </div>
-
-          <Button
-            variant="outline"
-            className="w-full"
-            onClick={handleGoogleSignIn}
-            disabled={isLoading}
-          >
-            <Chrome className="mr-2 h-4 w-4" />
-            Continue with Google
-          </Button>
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 };

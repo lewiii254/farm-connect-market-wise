@@ -10,4 +10,20 @@ if (!container) {
 }
 
 const root = createRoot(container);
-root.render(<App />);
+
+// Wrap in error boundary for better debugging
+try {
+  root.render(
+    <React.StrictMode>
+      <App />
+    </React.StrictMode>
+  );
+} catch (error) {
+  console.error('Failed to render app:', error);
+  root.render(
+    <div style={{ padding: '20px', color: 'red' }}>
+      <h1>Application Error</h1>
+      <p>Failed to load the application. Please check the console for details.</p>
+    </div>
+  );
+}

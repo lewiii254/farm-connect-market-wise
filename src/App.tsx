@@ -19,34 +19,43 @@ import PitchDeck from "./pages/PitchDeck";
 import Marketplace from "./pages/Marketplace";
 import NotFound from "./pages/NotFound";
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      retry: false,
+      refetchOnWindowFocus: false,
+    },
+  },
+});
 
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <AuthProvider>
-      <TooltipProvider>
-        <Toaster />
-        <Sonner />
-        <BrowserRouter>
-          <Routes>
-            <Route path="/" element={<Index />} />
-            <Route path="/markets" element={<Markets />} />
-            <Route path="/marketplace" element={<Marketplace />} />
-            <Route path="/buyers" element={<Buyers />} />
-            <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/community" element={<Community />} />
-            <Route path="/financial-services" element={<FinancialServices />} />
-            <Route path="/youth-mentorship" element={<YouthMentorship />} />
-            <Route path="/education" element={<AgriEducation />} />
-            <Route path="/auth" element={<Auth />} />
-            <Route path="/supply-chain" element={<SupplyChain />} />
-            <Route path="/pitch" element={<PitchDeck />} />
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </BrowserRouter>
-      </TooltipProvider>
-    </AuthProvider>
-  </QueryClientProvider>
-);
+const App = () => {
+  return (
+    <QueryClientProvider client={queryClient}>
+      <AuthProvider>
+        <TooltipProvider>
+          <Toaster />
+          <Sonner />
+          <BrowserRouter>
+            <Routes>
+              <Route path="/" element={<Index />} />
+              <Route path="/markets" element={<Markets />} />
+              <Route path="/marketplace" element={<Marketplace />} />
+              <Route path="/buyers" element={<Buyers />} />
+              <Route path="/dashboard" element={<Dashboard />} />
+              <Route path="/community" element={<Community />} />
+              <Route path="/financial-services" element={<FinancialServices />} />
+              <Route path="/youth-mentorship" element={<YouthMentorship />} />
+              <Route path="/education" element={<AgriEducation />} />
+              <Route path="/auth" element={<Auth />} />
+              <Route path="/supply-chain" element={<SupplyChain />} />
+              <Route path="/pitch" element={<PitchDeck />} />
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </BrowserRouter>
+        </TooltipProvider>
+      </AuthProvider>
+    </QueryClientProvider>
+  );
+};
 
 export default App;

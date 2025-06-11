@@ -1,8 +1,8 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { 
   Users, 
   GraduationCap, 
@@ -13,11 +13,18 @@ import {
   CheckCircle,
   UserPlus,
   Award,
-  Sprout
+  Sprout,
+  Calendar,
+  Target,
+  BookOpen,
+  TrendingUp
 } from 'lucide-react';
+import { MentorBookingDialog } from './mentorship/MentorBookingDialog';
+import { ProgramEnrollmentDialog } from './mentorship/ProgramEnrollmentDialog';
 
 const YouthMentorship = () => {
   const [selectedMentor, setSelectedMentor] = useState(null);
+  const [activeTab, setActiveTab] = useState("mentors");
 
   const mentors = [
     {
@@ -91,6 +98,13 @@ const YouthMentorship = () => {
     }
   ];
 
+  const myMentorshipStats = {
+    sessionsBooked: 3,
+    hoursCompleted: 12,
+    programsEnrolled: 2,
+    certificatesEarned: 1
+  };
+
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
       {/* Header */}
@@ -115,7 +129,7 @@ const YouthMentorship = () => {
           { icon: Award, label: "Success Rate", value: "92%", color: "text-purple-600 bg-purple-100" },
           { icon: CheckCircle, label: "Businesses Started", value: "240+", color: "text-orange-600 bg-orange-100" }
         ].map((stat, index) => (
-          <Card key={index} className="text-center">
+          <Card key={index} className="text-center hover:shadow-lg transition-shadow">
             <CardContent className="pt-6">
               <div className={`flex items-center justify-center w-12 h-12 rounded-xl mx-auto mb-3 ${stat.color}`}>
                 <stat.icon className="h-6 w-6" />
@@ -127,125 +141,266 @@ const YouthMentorship = () => {
         ))}
       </div>
 
-      {/* Featured Mentors */}
-      <div className="mb-12">
-        <h2 className="text-2xl font-bold text-gray-900 mb-8">Meet Our Expert Mentors</h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {mentors.map((mentor) => (
-            <Card key={mentor.id} className="hover:shadow-lg transition-all duration-300 hover-scale">
-              <CardHeader className="pb-4">
-                <div className="flex items-center space-x-4">
-                  <img 
-                    src={mentor.image} 
-                    alt={mentor.name}
-                    className="w-16 h-16 rounded-full object-cover"
+      {/* Interactive Tabs */}
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="mb-12">
+        <TabsList className="grid w-full grid-cols-4">
+          <TabsTrigger value="mentors">Find Mentors</TabsTrigger>
+          <TabsTrigger value="programs">Join Programs</TabsTrigger>
+          <TabsTrigger value="dashboard">My Progress</TabsTrigger>
+          <TabsTrigger value="community">Community</TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="mentors" className="mt-6">
+          <div className="mb-6">
+            <h2 className="text-2xl font-bold text-gray-900 mb-4">Meet Our Expert Mentors</h2>
+            <p className="text-gray-600">Book personalized sessions with experienced farmers who've built successful agribusinesses.</p>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {mentors.map((mentor) => (
+              <Card key={mentor.id} className="hover:shadow-lg transition-all duration-300">
+                <CardHeader className="pb-4">
+                  <div className="flex items-center space-x-4">
+                    <img 
+                      src={mentor.image} 
+                      alt={mentor.name}
+                      className="w-16 h-16 rounded-full object-cover"
+                    />
+                    <div className="flex-1">
+                      <CardTitle className="text-lg">{mentor.name}</CardTitle>
+                      <div className="flex items-center text-sm text-gray-600 mt-1">
+                        <MapPin className="h-4 w-4 mr-1" />
+                        {mentor.location}
+                      </div>
+                      <div className="flex items-center mt-1">
+                        <Star className="h-4 w-4 text-yellow-400 fill-current mr-1" />
+                        <span className="text-sm font-medium">{mentor.rating}</span>
+                        <span className="text-sm text-gray-500 ml-2">({mentor.mentees} mentees)</span>
+                      </div>
+                    </div>
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-gray-600 text-sm mb-4">{mentor.bio}</p>
+                  
+                  <div className="mb-4">
+                    <div className="text-sm font-medium text-gray-700 mb-2">Specializations:</div>
+                    <div className="flex flex-wrap gap-1">
+                      {mentor.specialization.map((spec, idx) => (
+                        <Badge key={idx} variant="secondary" className="text-xs">
+                          {spec}
+                        </Badge>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center text-sm text-gray-600">
+                      <Clock className="h-4 w-4 mr-1" />
+                      {mentor.availability}
+                    </div>
+                    <MentorBookingDialog
+                      mentor={mentor}
+                      trigger={
+                        <Button size="sm" className="bg-green-600 hover:bg-green-700">
+                          <Calendar className="h-4 w-4 mr-1" />
+                          Book Session
+                        </Button>
+                      }
+                    />
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </TabsContent>
+
+        <TabsContent value="programs" className="mt-6">
+          <div className="mb-6">
+            <h2 className="text-2xl font-bold text-gray-900 mb-4">Youth Development Programs</h2>
+            <p className="text-gray-600">Enroll in comprehensive programs designed specifically for young farmers.</p>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {youthPrograms.map((program, index) => (
+              <Card key={index} className="hover:shadow-lg transition-all duration-300">
+                <CardHeader>
+                  <CardTitle className="text-lg text-green-600">{program.title}</CardTitle>
+                  <p className="text-gray-600">{program.description}</p>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-3 mb-6">
+                    <div className="flex justify-between">
+                      <span className="text-sm text-gray-600">Duration:</span>
+                      <span className="text-sm font-medium">{program.duration}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-sm text-gray-600">Participants:</span>
+                      <span className="text-sm font-medium">{program.participants} enrolled</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-sm text-gray-600">Next Start:</span>
+                      <span className="text-sm font-medium text-green-600">{program.nextStart}</span>
+                    </div>
+                  </div>
+
+                  <div className="mb-6">
+                    <div className="text-sm font-medium text-gray-700 mb-2">Program Benefits:</div>
+                    <ul className="space-y-1">
+                      {program.benefits.map((benefit, idx) => (
+                        <li key={idx} className="flex items-center text-sm text-gray-600">
+                          <CheckCircle className="h-4 w-4 text-green-500 mr-2 flex-shrink-0" />
+                          {benefit}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+
+                  <ProgramEnrollmentDialog
+                    program={program}
+                    trigger={
+                      <Button className="w-full bg-green-600 hover:bg-green-700">
+                        <UserPlus className="h-4 w-4 mr-2" />
+                        Enroll Now (FREE)
+                      </Button>
+                    }
                   />
-                  <div className="flex-1">
-                    <CardTitle className="text-lg">{mentor.name}</CardTitle>
-                    <div className="flex items-center text-sm text-gray-600 mt-1">
-                      <MapPin className="h-4 w-4 mr-1" />
-                      {mentor.location}
-                    </div>
-                    <div className="flex items-center mt-1">
-                      <Star className="h-4 w-4 text-yellow-400 fill-current mr-1" />
-                      <span className="text-sm font-medium">{mentor.rating}</span>
-                      <span className="text-sm text-gray-500 ml-2">({mentor.mentees} mentees)</span>
-                    </div>
-                  </div>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <p className="text-gray-600 text-sm mb-4">{mentor.bio}</p>
-                
-                <div className="mb-4">
-                  <div className="text-sm font-medium text-gray-700 mb-2">Specializations:</div>
-                  <div className="flex flex-wrap gap-1">
-                    {mentor.specialization.map((spec, idx) => (
-                      <Badge key={idx} variant="secondary" className="text-xs">
-                        {spec}
-                      </Badge>
-                    ))}
-                  </div>
-                </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </TabsContent>
 
-                <div className="mb-4">
-                  <div className="text-sm font-medium text-gray-700 mb-2">Achievements:</div>
-                  <ul className="space-y-1">
-                    {mentor.achievements.slice(0, 2).map((achievement, idx) => (
-                      <li key={idx} className="flex items-center text-xs text-gray-600">
-                        <Award className="h-3 w-3 text-green-500 mr-2 flex-shrink-0" />
-                        {achievement}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
+        <TabsContent value="dashboard" className="mt-6">
+          <div className="mb-6">
+            <h2 className="text-2xl font-bold text-gray-900 mb-4">My Mentorship Journey</h2>
+            <p className="text-gray-600">Track your progress and upcoming activities.</p>
+          </div>
 
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center text-sm text-gray-600">
-                    <Clock className="h-4 w-4 mr-1" />
-                    {mentor.availability}
+          {/* Personal Stats */}
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+            <Card className="text-center">
+              <CardContent className="pt-6">
+                <div className="text-2xl font-bold text-blue-600 mb-2">{myMentorshipStats.sessionsBooked}</div>
+                <div className="text-sm text-gray-600">Sessions Booked</div>
+              </CardContent>
+            </Card>
+            <Card className="text-center">
+              <CardContent className="pt-6">
+                <div className="text-2xl font-bold text-green-600 mb-2">{myMentorshipStats.hoursCompleted}</div>
+                <div className="text-sm text-gray-600">Hours Completed</div>
+              </CardContent>
+            </Card>
+            <Card className="text-center">
+              <CardContent className="pt-6">
+                <div className="text-2xl font-bold text-purple-600 mb-2">{myMentorshipStats.programsEnrolled}</div>
+                <div className="text-sm text-gray-600">Programs Enrolled</div>
+              </CardContent>
+            </Card>
+            <Card className="text-center">
+              <CardContent className="pt-6">
+                <div className="text-2xl font-bold text-orange-600 mb-2">{myMentorshipStats.certificatesEarned}</div>
+                <div className="text-sm text-gray-600">Certificates Earned</div>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Upcoming Sessions */}
+          <Card className="mb-6">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Calendar className="h-5 w-5" />
+                Upcoming Sessions
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                <div className="flex items-center justify-between p-4 border rounded-lg">
+                  <div>
+                    <h4 className="font-medium">Business Planning Session</h4>
+                    <p className="text-sm text-gray-600">with Samuel Kiprotich</p>
+                    <p className="text-sm text-green-600">Tomorrow at 2:00 PM</p>
                   </div>
-                  <Button 
-                    size="sm"
-                    className="bg-green-600 hover:bg-green-700"
-                    onClick={() => setSelectedMentor(mentor)}
-                  >
-                    <UserPlus className="h-4 w-4 mr-1" />
-                    Connect
+                  <Button size="sm" variant="outline">
+                    <MessageCircle className="h-4 w-4 mr-1" />
+                    Message
                   </Button>
                 </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-      </div>
+                <div className="flex items-center justify-between p-4 border rounded-lg">
+                  <div>
+                    <h4 className="font-medium">Market Access Training</h4>
+                    <p className="text-sm text-gray-600">with Grace Wanjiku</p>
+                    <p className="text-sm text-green-600">Friday at 4:00 PM</p>
+                  </div>
+                  <Button size="sm" variant="outline">
+                    <MessageCircle className="h-4 w-4 mr-1" />
+                    Message
+                  </Button>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
 
-      {/* Youth Programs */}
-      <div className="mb-12">
-        <h2 className="text-2xl font-bold text-gray-900 mb-8">Youth Development Programs</h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {youthPrograms.map((program, index) => (
-            <Card key={index} className="hover:shadow-lg transition-all duration-300">
+        <TabsContent value="community" className="mt-6">
+          <div className="mb-6">
+            <h2 className="text-2xl font-bold text-gray-900 mb-4">Youth Farmer Community</h2>
+            <p className="text-gray-600">Connect with fellow young farmers and share experiences.</p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <Card>
               <CardHeader>
-                <CardTitle className="text-lg text-green-600">{program.title}</CardTitle>
-                <p className="text-gray-600">{program.description}</p>
+                <CardTitle className="flex items-center gap-2">
+                  <MessageCircle className="h-5 w-5" />
+                  Recent Discussions
+                </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="space-y-3 mb-6">
-                  <div className="flex justify-between">
-                    <span className="text-sm text-gray-600">Duration:</span>
-                    <span className="text-sm font-medium">{program.duration}</span>
+                <div className="space-y-4">
+                  <div className="border-l-4 border-green-500 pl-4">
+                    <h4 className="font-medium text-sm">Organic Certification Tips</h4>
+                    <p className="text-xs text-gray-600">by Mary K. • 2 hours ago</p>
                   </div>
-                  <div className="flex justify-between">
-                    <span className="text-sm text-gray-600">Participants:</span>
-                    <span className="text-sm font-medium">{program.participants} enrolled</span>
+                  <div className="border-l-4 border-blue-500 pl-4">
+                    <h4 className="font-medium text-sm">Greenhouse Setup on Budget</h4>
+                    <p className="text-xs text-gray-600">by John M. • 5 hours ago</p>
                   </div>
-                  <div className="flex justify-between">
-                    <span className="text-sm text-gray-600">Next Start:</span>
-                    <span className="text-sm font-medium text-green-600">{program.nextStart}</span>
+                  <div className="border-l-4 border-purple-500 pl-4">
+                    <h4 className="font-medium text-sm">Digital Marketing Success</h4>
+                    <p className="text-xs text-gray-600">by Sarah L. • 1 day ago</p>
                   </div>
                 </div>
-
-                <div className="mb-6">
-                  <div className="text-sm font-medium text-gray-700 mb-2">Program Benefits:</div>
-                  <ul className="space-y-1">
-                    {program.benefits.map((benefit, idx) => (
-                      <li key={idx} className="flex items-center text-sm text-gray-600">
-                        <CheckCircle className="h-4 w-4 text-green-500 mr-2 flex-shrink-0" />
-                        {benefit}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-
-                <Button className="w-full bg-green-600 hover:bg-green-700">
-                  Apply Now
-                </Button>
               </CardContent>
             </Card>
-          ))}
-        </div>
-      </div>
+
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <TrendingUp className="h-5 w-5" />
+                  Success Stories
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  <div className="bg-green-50 p-3 rounded-lg">
+                    <h4 className="font-medium text-sm text-green-800">James increased yields by 60%</h4>
+                    <p className="text-xs text-green-600">Using precision farming techniques</p>
+                  </div>
+                  <div className="bg-blue-50 p-3 rounded-lg">
+                    <h4 className="font-medium text-sm text-blue-800">Grace started export business</h4>
+                    <p className="text-xs text-blue-600">Now supplies to 3 countries</p>
+                  </div>
+                  <div className="bg-purple-50 p-3 rounded-lg">
+                    <h4 className="font-medium text-sm text-purple-800">Peter formed successful cooperative</h4>
+                    <p className="text-xs text-purple-600">200+ farmers joined in 6 months</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </TabsContent>
+      </Tabs>
 
       {/* Call to Action */}
       <div className="bg-gradient-to-r from-green-600 to-green-700 rounded-3xl p-8 text-white text-center">

@@ -1,7 +1,7 @@
 
 import React, { useEffect } from 'react';
 import { AuthForm } from '@/components/auth/AuthForm';
-import { useAuth } from '@/hooks/useAuth';
+import { useAuth } from '@/components/auth/AuthProvider';
 import { useNavigate } from 'react-router-dom';
 
 const Auth = () => {

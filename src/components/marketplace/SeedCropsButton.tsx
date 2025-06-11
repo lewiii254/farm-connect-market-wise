@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Seedling, Loader2 } from 'lucide-react';
+import { Sprout, Loader2 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
 
@@ -47,7 +47,7 @@ export const SeedCropsButton = ({ onSuccess }: SeedCropsButtonProps) => {
       {isSeeding ? (
         <Loader2 className="h-4 w-4 animate-spin" />
       ) : (
-        <Seedling className="h-4 w-4" />
+        <Sprout className="h-4 w-4" />
       )}
       {isSeeding ? 'Adding Sample Crops...' : 'Add Sample Crops'}
     </Button>

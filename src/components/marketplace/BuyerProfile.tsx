@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -74,16 +75,13 @@ const isValidSelectValue = (value: any): value is string => {
     value !== '' &&
     !/^\s*$/.test(value)
   );
-  console.log('isValidSelectValue check:', { value, result, type: typeof value });
   return result;
 };
 
-// Apply filtering and ensure no empty strings
-const BUSINESS_TYPES = RAW_BUSINESS_TYPES.filter(isValidSelectValue);
-const KENYAN_COUNTIES = RAW_KENYAN_COUNTIES.filter(isValidSelectValue);
-const AVAILABLE_CROPS = RAW_AVAILABLE_CROPS.filter(isValidSelectValue);
-
-console.log('Filtered arrays:', { BUSINESS_TYPES, KENYAN_COUNTIES, AVAILABLE_CROPS });
+// Apply filtering and ensure no empty strings - with additional safety
+const BUSINESS_TYPES = RAW_BUSINESS_TYPES.filter(isValidSelectValue).filter(Boolean);
+const KENYAN_COUNTIES = RAW_KENYAN_COUNTIES.filter(isValidSelectValue).filter(Boolean);
+const AVAILABLE_CROPS = RAW_AVAILABLE_CROPS.filter(isValidSelectValue).filter(Boolean);
 
 const BuyerProfile = () => {
   const { user } = useAuth();
@@ -231,48 +229,24 @@ const BuyerProfile = () => {
     }
   };
 
-  // Helper function to get safe select value - never returns empty string, only valid strings or undefined
-  const getSafeSelectValue = (value: string) => {
-    console.log('getSafeSelectValue called with:', { value, type: typeof value });
-    const result = isValidSelectValue(value) ? value : undefined;
-    console.log('getSafeSelectValue returning:', result);
-    return result;
+  // Absolutely safe select value getter - NEVER returns empty string
+  const getSafeSelectValue = (value: string): string | undefined => {
+    if (!value || typeof value !== 'string' || value.trim() === '') {
+      return undefined;
+    }
+    return isValidSelectValue(value) ? value : undefined;
   };
 
-  // Safe SelectItem renderer with ultra-strict validation and detailed logging
+  // Safe SelectItem renderer that absolutely prevents empty strings
   const renderSafeSelectItems = (items: string[], labelTransform?: (item: string) => string) => {
-    console.log('renderSafeSelectItems called with:', { items, itemsLength: items.length });
-    
-    // First filter: remove any invalid items
-    const validItems = items.filter(item => {
-      const isValid = isValidSelectValue(item);
-      console.log('Filtering item:', { item, isValid, type: typeof item });
-      if (!isValid) {
-        console.error('FILTERED OUT invalid item for SelectItem:', item, typeof item);
-      }
-      return isValid;
-    });
-
-    console.log('Valid items after filtering:', { validItems, count: validItems.length });
-    
-    // Second pass: create SelectItems with final validation
-    const selectItems = validItems.map((item) => {
-      // Absolutely final safety check before creating SelectItem
-      if (!isValidSelectValue(item)) {
-        console.error('CRITICAL: Invalid item somehow passed validation:', { item, type: typeof item });
-        return null;
-      }
-      
-      console.log('Creating SelectItem with value:', { item, type: typeof item });
-      return (
+    return items
+      .filter(item => isValidSelectValue(item)) // First filter
+      .filter(item => item && item.trim().length > 0) // Second filter for extra safety
+      .map((item) => (
         <SelectItem key={`select-item-${item}`} value={item}>
           {labelTransform ? labelTransform(item) : item}
         </SelectItem>
-      );
-    }).filter(Boolean); // Remove any null items
-
-    console.log('Final SelectItems created:', selectItems.length);
-    return selectItems;
+      ));
   };
 
   if (isLoading) {
@@ -330,12 +304,8 @@ const BuyerProfile = () => {
                 <Select 
                   value={getSafeSelectValue(formData.business_type)} 
                   onValueChange={(value) => {
-                    console.log('Business type onValueChange called with:', { value, type: typeof value });
                     if (value && isValidSelectValue(value) && BUSINESS_TYPES.includes(value)) {
-                      console.log('Setting business_type to:', value);
                       setFormData({...formData, business_type: value});
-                    } else {
-                      console.warn('Invalid business type value rejected:', value);
                     }
                   }}
                 >
@@ -353,12 +323,8 @@ const BuyerProfile = () => {
                 <Select 
                   value={getSafeSelectValue(formData.location)} 
                   onValueChange={(value) => {
-                    console.log('Location onValueChange called with:', { value, type: typeof value });
                     if (value && isValidSelectValue(value) && KENYAN_COUNTIES.includes(value)) {
-                      console.log('Setting location to:', value);
                       setFormData({...formData, location: value});
-                    } else {
-                      console.warn('Invalid location value rejected:', value);
                     }
                   }}
                 >

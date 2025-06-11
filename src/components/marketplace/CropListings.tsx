@@ -92,8 +92,27 @@ const CropListings = ({ key }: { key?: number }) => {
     setFilteredListings(filtered);
   };
 
-  const uniqueLocations = [...new Set(listings.map(listing => listing.location))];
-  const uniqueCrops = [...new Set(listings.map(listing => listing.crop_name))];
+  // Safe helper to filter out empty or invalid values
+  const getSafeSelectValue = (value: string): string | undefined => {
+    if (!value || typeof value !== 'string' || value.trim() === '') {
+      return undefined;
+    }
+    return value;
+  };
+
+  // Safe SelectItem renderer
+  const renderSafeSelectItems = (items: string[]) => {
+    return items
+      .filter(item => item && typeof item === 'string' && item.trim().length > 0)
+      .map((item) => (
+        <SelectItem key={`select-item-${item}`} value={item}>
+          {item}
+        </SelectItem>
+      ));
+  };
+
+  const uniqueLocations = [...new Set(listings.map(listing => listing.location))].filter(Boolean);
+  const uniqueCrops = [...new Set(listings.map(listing => listing.crop_name))].filter(Boolean);
 
   if (loading) {
     return (
@@ -120,36 +139,32 @@ const CropListings = ({ key }: { key?: number }) => {
             className="lg:col-span-2"
           />
           
-          <Select value={locationFilter} onValueChange={setLocationFilter}>
+          <Select value={getSafeSelectValue(locationFilter)} onValueChange={(value) => setLocationFilter(value || '')}>
             <SelectTrigger>
               <SelectValue placeholder="Filter by location" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">All Locations</SelectItem>
-              {uniqueLocations.map(location => (
-                <SelectItem key={location} value={location}>{location}</SelectItem>
-              ))}
+              <SelectItem value="all-locations">All Locations</SelectItem>
+              {renderSafeSelectItems(uniqueLocations)}
             </SelectContent>
           </Select>
 
-          <Select value={cropFilter} onValueChange={setCropFilter}>
+          <Select value={getSafeSelectValue(cropFilter)} onValueChange={(value) => setCropFilter(value || '')}>
             <SelectTrigger>
               <SelectValue placeholder="Filter by crop" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">All Crops</SelectItem>
-              {uniqueCrops.map(crop => (
-                <SelectItem key={crop} value={crop}>{crop}</SelectItem>
-              ))}
+              <SelectItem value="all-crops">All Crops</SelectItem>
+              {renderSafeSelectItems(uniqueCrops)}
             </SelectContent>
           </Select>
 
-          <Select value={organicFilter} onValueChange={setOrganicFilter}>
+          <Select value={getSafeSelectValue(organicFilter)} onValueChange={(value) => setOrganicFilter(value || '')}>
             <SelectTrigger>
               <SelectValue placeholder="Organic filter" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">All Types</SelectItem>
+              <SelectItem value="all-types">All Types</SelectItem>
               <SelectItem value="organic">Organic Only</SelectItem>
               <SelectItem value="conventional">Conventional</SelectItem>
             </SelectContent>

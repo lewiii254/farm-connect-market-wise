@@ -320,7 +320,7 @@ const BuyerProfile = () => {
                   value={getSafeSelectValue(formData.business_type)} 
                   onValueChange={(value) => {
                     console.log('Business type selected:', value);
-                    if (value && BUSINESS_TYPES.includes(value)) {
+                    if (value && isValidSelectValue(value) && BUSINESS_TYPES.includes(value)) {
                       setFormData({...formData, business_type: value});
                     }
                   }}
@@ -329,7 +329,7 @@ const BuyerProfile = () => {
                     <SelectValue placeholder="Select business type" />
                   </SelectTrigger>
                   <SelectContent>
-                    {BUSINESS_TYPES.map((type) => (
+                    {BUSINESS_TYPES.filter(isValidSelectValue).map((type) => (
                       <SelectItem key={type} value={type}>
                         {type.charAt(0).toUpperCase() + type.slice(1)}
                       </SelectItem>
@@ -344,7 +344,7 @@ const BuyerProfile = () => {
                   value={getSafeSelectValue(formData.location)} 
                   onValueChange={(value) => {
                     console.log('Location selected:', value);
-                    if (value && KENYAN_COUNTIES.includes(value)) {
+                    if (value && isValidSelectValue(value) && KENYAN_COUNTIES.includes(value)) {
                       setFormData({...formData, location: value});
                     }
                   }}
@@ -353,7 +353,7 @@ const BuyerProfile = () => {
                     <SelectValue placeholder="Select location" />
                   </SelectTrigger>
                   <SelectContent>
-                    {KENYAN_COUNTIES.map((county) => (
+                    {KENYAN_COUNTIES.filter(isValidSelectValue).map((county) => (
                       <SelectItem key={county} value={county}>
                         {county}
                       </SelectItem>
@@ -389,7 +389,7 @@ const BuyerProfile = () => {
             <div className="space-y-2">
               <Label>Preferred Crops</Label>
               <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
-                {AVAILABLE_CROPS.map((crop) => (
+                {AVAILABLE_CROPS.filter(isValidSelectValue).map((crop) => (
                   <div key={crop} className="flex items-center space-x-2">
                     <Button
                       type="button"

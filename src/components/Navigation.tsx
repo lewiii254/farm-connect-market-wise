@@ -83,19 +83,11 @@ const Navigation = () => {
 
   const handleSignOut = async () => {
     try {
-      const { error } = await signOut();
-      if (error) {
-        toast({
-          title: "Sign Out Failed",
-          description: error.message,
-          variant: "destructive"
-        });
-      } else {
-        toast({
-          title: "Signed Out Successfully",
-          description: "Come back soon!",
-        });
-      }
+      await signOut();
+      toast({
+        title: "Signed Out Successfully",
+        description: "Come back soon!",
+      });
     } catch (error) {
       toast({
         title: "Sign Out Failed",
@@ -421,3 +413,5 @@ const Navigation = () => {
 };
 
 export default Navigation;
+
+}

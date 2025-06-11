@@ -22,7 +22,7 @@ interface BuyerProfileData {
   preferred_crops: string[] | null;
 }
 
-// Clean arrays at definition time with immediate filtering
+// Clean arrays at definition time with strict filtering
 const RAW_BUSINESS_TYPES = [
   'supermarket',
   'restaurant', 
@@ -65,7 +65,7 @@ const RAW_AVAILABLE_CROPS = [
   'Spinach'
 ];
 
-// Apply ultra-strict filtering with multiple validation layers
+// Ultra-strict filtering to prevent empty strings
 const isValidSelectValue = (value: any): value is string => {
   return (
     value !== null &&
@@ -73,18 +73,16 @@ const isValidSelectValue = (value: any): value is string => {
     typeof value === 'string' &&
     value.trim().length > 0 &&
     value !== '' &&
-    !/^\s*$/.test(value) // No whitespace-only strings
+    !/^\s*$/.test(value)
   );
 };
 
+// Apply filtering and ensure no empty strings
 const BUSINESS_TYPES = RAW_BUSINESS_TYPES.filter(isValidSelectValue);
 const KENYAN_COUNTIES = RAW_KENYAN_COUNTIES.filter(isValidSelectValue);
 const AVAILABLE_CROPS = RAW_AVAILABLE_CROPS.filter(isValidSelectValue);
 
-// Log the final arrays to ensure they're clean
-console.log('BUSINESS_TYPES after filtering:', BUSINESS_TYPES);
-console.log('KENYAN_COUNTIES after filtering:', KENYAN_COUNTIES);
-console.log('AVAILABLE_CROPS after filtering:', AVAILABLE_CROPS);
+console.log('Filtered arrays:', { BUSINESS_TYPES, KENYAN_COUNTIES, AVAILABLE_CROPS });
 
 const BuyerProfile = () => {
   const { user } = useAuth();
@@ -331,7 +329,11 @@ const BuyerProfile = () => {
                     <SelectValue placeholder="Select business type" />
                   </SelectTrigger>
                   <SelectContent>
-                    {renderSafeSelectItems(BUSINESS_TYPES, (type) => type.charAt(0).toUpperCase() + type.slice(1))}
+                    {BUSINESS_TYPES.map((type) => (
+                      <SelectItem key={type} value={type}>
+                        {type.charAt(0).toUpperCase() + type.slice(1)}
+                      </SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
               </div>
@@ -351,7 +353,11 @@ const BuyerProfile = () => {
                     <SelectValue placeholder="Select location" />
                   </SelectTrigger>
                   <SelectContent>
-                    {renderSafeSelectItems(KENYAN_COUNTIES)}
+                    {KENYAN_COUNTIES.map((county) => (
+                      <SelectItem key={county} value={county}>
+                        {county}
+                      </SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
               </div>
@@ -383,7 +389,7 @@ const BuyerProfile = () => {
             <div className="space-y-2">
               <Label>Preferred Crops</Label>
               <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
-                {AVAILABLE_CROPS.filter(isValidSelectValue).map((crop) => (
+                {AVAILABLE_CROPS.map((crop) => (
                   <div key={crop} className="flex items-center space-x-2">
                     <Button
                       type="button"

@@ -369,10 +369,48 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      business_profiles: {
+        Row: {
+          county: string | null
+          created_at: string | null
+          farm_size_acres: number | null
+          full_name: string | null
+          id: string | null
+          primary_crops: string[] | null
+          updated_at: string | null
+          username: string | null
+        }
+        Insert: {
+          county?: string | null
+          created_at?: string | null
+          farm_size_acres?: number | null
+          full_name?: string | null
+          id?: string | null
+          primary_crops?: string[] | null
+          updated_at?: string | null
+          username?: string | null
+        }
+        Update: {
+          county?: string | null
+          created_at?: string | null
+          farm_size_acres?: number | null
+          full_name?: string | null
+          id?: string | null
+          primary_crops?: string[] | null
+          updated_at?: string | null
+          username?: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
-      [_ in never]: never
+      get_user_active_orders: {
+        Args: { check_user_id: string }
+        Returns: {
+          buyer_user_id: string
+          farmer_id: string
+        }[]
+      }
     }
     Enums: {
       [_ in never]: never

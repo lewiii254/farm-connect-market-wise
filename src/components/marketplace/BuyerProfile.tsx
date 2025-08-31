@@ -9,6 +9,12 @@ import { Building2, Phone, MapPin, Package } from 'lucide-react';
 import { useAuth } from '@/components/auth/AuthProvider';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
+import { 
+  isValidKenyanPhone, 
+  formatPhoneInput, 
+  getPhoneValidationError, 
+  formatKenyanPhone 
+} from '@/utils/phoneValidation';
 
 interface BuyerProfileData {
   id: string;
@@ -146,10 +152,22 @@ const BuyerProfile = () => {
     
     if (!user) return;
 
+    // Validate required fields
     if (!formData.company_name || !formData.business_type || !formData.location || !formData.phone_number) {
       toast({
         title: "Missing Information",
         description: "Please fill in all required fields",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    // Validate phone number
+    const phoneError = getPhoneValidationError(formData.phone_number);
+    if (phoneError) {
+      toast({
+        title: "Invalid Phone Number",
+        description: phoneError,
         variant: "destructive"
       });
       return;
@@ -163,7 +181,7 @@ const BuyerProfile = () => {
         company_name: formData.company_name,
         business_type: formData.business_type,
         location: formData.location,
-        phone_number: formData.phone_number,
+        phone_number: formatKenyanPhone(formData.phone_number) || formData.phone_number,
         minimum_order_kg: formData.minimum_order_kg ? parseFloat(formData.minimum_order_kg) : null,
         preferred_crops: formData.preferred_crops.length > 0 ? formData.preferred_crops : null,
       };
@@ -341,9 +359,18 @@ const BuyerProfile = () => {
                 <Input
                   id="phone_number"
                   value={formData.phone_number}
-                  onChange={(e) => setFormData({...formData, phone_number: e.target.value})}
-                  placeholder="+254 XXX XXX XXX"
+                  onChange={(e) => {
+                    const formatted = formatPhoneInput(e.target.value, formData.phone_number);
+                    setFormData({...formData, phone_number: formatted});
+                  }}
+                  placeholder="+254 7XX XXX XXX"
+                  className={!isValidKenyanPhone(formData.phone_number) && formData.phone_number ? "border-red-500" : ""}
                 />
+                {formData.phone_number && !isValidKenyanPhone(formData.phone_number) && (
+                  <p className="text-sm text-red-600">
+                    Please enter a valid Kenyan phone number
+                  </p>
+                )}
               </div>
 
               <div className="space-y-2 md:col-span-2">

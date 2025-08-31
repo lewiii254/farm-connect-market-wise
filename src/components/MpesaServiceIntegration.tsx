@@ -17,6 +17,12 @@ import {
 } from 'lucide-react';
 import { toast } from "@/hooks/use-toast";
 import { useMpesa } from '@/hooks/useMpesa';
+import { 
+  isValidMpesaPhone, 
+  formatPhoneInput, 
+  getPhoneValidationError, 
+  formatMpesaPhone 
+} from '@/utils/phoneValidation';
 
 interface MpesaServicePaymentProps {
   serviceName: string;
@@ -43,17 +49,19 @@ export const MpesaServicePayment = ({
   const [transactionId, setTransactionId] = useState<string | null>(null);
 
   const handlePayment = async () => {
-    if (!phoneNumber || phoneNumber.length < 10) {
+    // Validate phone number for M-Pesa
+    const phoneError = getPhoneValidationError(phoneNumber, true);
+    if (phoneError) {
       toast({
         title: "Invalid Phone Number",
-        description: "Please enter a valid M-Pesa phone number",
+        description: phoneError,
         variant: "destructive"
       });
       return;
     }
 
     try {
-      const checkoutRequestID = await initiatePayment(phoneNumber, amount, description);
+      const checkoutRequestID = await initiatePayment(formatMpesaPhone(phoneNumber) || phoneNumber, amount, description);
       setTransactionId(checkoutRequestID);
       
       // Poll for transaction status
@@ -141,13 +149,21 @@ export const MpesaServicePayment = ({
               <Input
                 id="phone"
                 type="tel"
-                placeholder="254712345678"
+                placeholder="+254 7XX XXX XXX"
                 value={phoneNumber}
-                onChange={(e) => setPhoneNumber(e.target.value)}
-                className="pl-10"
+                onChange={(e) => {
+                  const formatted = formatPhoneInput(e.target.value, phoneNumber);
+                  setPhoneNumber(formatted);
+                }}
+                className={`pl-10 ${!isValidMpesaPhone(phoneNumber) && phoneNumber ? "border-red-500" : ""}`}
                 disabled={isLoading}
               />
             </div>
+            {phoneNumber && !isValidMpesaPhone(phoneNumber) && (
+              <p className="text-sm text-red-600">
+                Please enter a valid M-Pesa phone number
+              </p>
+            )}
           </div>
 
           <Button 

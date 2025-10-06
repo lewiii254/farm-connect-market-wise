@@ -13,6 +13,8 @@
 
 ### 📊 [View Our Investor Pitch Deck](https://gamma.app/docs/FarmConnect-Kenya-Empowering-Smallholder-Farmers-Through-Digital--2t7mdmme1ka0jfh) 📊
 
+### 📄 [Complete Innovation Documentation](./INNOVATION.md) - Problem, Solution, Features, Timeline & Commercialization Plan 📄
+
 </div>
 
 ---
@@ -29,6 +31,32 @@
 - 🤝 **Market access barriers** - Difficulty connecting with verified buyers
 - 💰 **Financial exclusion** - Limited access to agricultural credit and insurance
 - 👨‍🌾 **Youth migration** - Young people leaving agriculture for urban areas
+
+---
+
+## 📚 Documentation
+
+### 📄 [Complete Innovation Analysis](./INNOVATION.md)
+
+For a comprehensive deep-dive into FarmConnect Kenya's innovation, including:
+
+- **🎯 Problem Statement**: Detailed analysis of agricultural challenges in Kenya
+- **💡 Solution Overview**: Complete platform architecture and differentiators  
+- **🚀 Feature Breakdown**: 8 major features with implementation details
+  - Direct Marketplace
+  - Market Intelligence
+  - Financial Services
+  - Youth Empowerment
+  - Community Platform
+  - Supply Chain
+  - M-Pesa Integration
+  - Analytics Dashboard
+- **📅 Gantt Chart**: 5-phase implementation timeline (MVP to Pan-African expansion)
+- **💼 Commercialization Plan**: Revenue model, go-to-market strategy, funding roadmap
+- **📊 Financial Projections**: 5-year growth from KSh 8M to 1.2B revenue
+- **🎯 Impact Metrics**: Social impact goals and UN SDG alignment
+
+[**→ Read Full Innovation Documentation**](./INNOVATION.md)
 
 ---
 

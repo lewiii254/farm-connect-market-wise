@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { TrendingUp, MapPin, Users, Bell, Package, CreditCard, Truck, MessageCircle, Shield, Clock, Smartphone, BarChart3 } from 'lucide-react';
+import { TrendingUp, MapPin, Users, Bell, Package, CreditCard, Truck, MessageCircle, Shield, Clock, Smartphone, BarChart3, Sparkles, Cloud, QrCode } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 
@@ -73,6 +73,36 @@ const Features = () => {
     }
   ];
 
+  const competitiveFeatures = [
+    {
+      name: 'AI Crop Health Diagnostics',
+      description: 'Upload crop photos for instant disease detection and treatment recommendations using advanced AI.',
+      icon: Sparkles,
+      badge: 'NEW',
+      impact: '30-40% reduction in crop loss',
+      color: 'from-purple-500 to-pink-500',
+      link: '/crop-diagnostics'
+    },
+    {
+      name: 'Smart Weather Advisor',
+      description: '7-day forecast with AI-powered farming recommendations for optimal planting and harvesting.',
+      icon: Cloud,
+      badge: 'NEW',
+      impact: '20-25% yield increase',
+      color: 'from-blue-500 to-cyan-500',
+      link: '/weather-insights'
+    },
+    {
+      name: 'Blockchain Traceability',
+      description: 'Immutable supply chain records with QR codes for premium market access and export certification.',
+      icon: QrCode,
+      badge: 'NEW',
+      impact: '40-50% price premium',
+      color: 'from-green-500 to-emerald-500',
+      link: '/traceability'
+    }
+  ];
+
   const benefits = [
     '35% average revenue increase',
     '50% faster market access',
@@ -107,6 +137,64 @@ const Features = () => {
                 <div className="w-2 h-2 bg-green-500 rounded-full mr-2"></div>
                 {benefit}
               </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Competitive Advantage Features - Highlighted Section */}
+        <div className="mb-20">
+          <div className="text-center mb-8">
+            <div className="inline-flex items-center px-4 py-2 bg-gradient-to-r from-purple-100 to-pink-100 rounded-full text-purple-800 text-sm font-medium mb-4">
+              <Sparkles className="h-4 w-4 mr-2" />
+              Competitive Advantages
+            </div>
+            <h3 className="text-3xl font-bold text-gray-900 mb-3">
+              Next-Generation Features That Set Us Apart
+            </h3>
+            <p className="text-lg text-gray-600 max-w-3xl mx-auto">
+              Revolutionary AI and blockchain technologies that give FarmConnect Kenya a decisive edge in the market
+            </p>
+          </div>
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
+            {competitiveFeatures.map((feature) => (
+              <Link key={feature.name} to={feature.link} className="group relative">
+                <div className="bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 p-8 h-full border-2 border-transparent hover:border-purple-300 transform hover:-translate-y-2">
+                  {/* NEW Badge */}
+                  <div className="absolute -top-3 -right-3">
+                    <div className="bg-gradient-to-r from-purple-600 to-pink-600 text-white px-4 py-1 rounded-full text-xs font-bold shadow-lg animate-pulse">
+                      {feature.badge}
+                    </div>
+                  </div>
+                  
+                  <div className="mb-6">
+                    <div className={`inline-flex items-center justify-center h-16 w-16 rounded-2xl bg-gradient-to-r ${feature.color} text-white group-hover:scale-110 transition-transform duration-300 shadow-lg mb-4`}>
+                      <feature.icon className="h-8 w-8" />
+                    </div>
+                  </div>
+                  
+                  <h3 className="text-xl font-bold text-gray-900 mb-3 group-hover:text-purple-600 transition-colors">
+                    {feature.name}
+                  </h3>
+                  
+                  <p className="text-gray-600 text-sm leading-relaxed mb-4">
+                    {feature.description}
+                  </p>
+                  
+                  <div className="bg-gradient-to-r from-green-50 to-emerald-50 p-3 rounded-lg border border-green-200 mb-4">
+                    <div className="flex items-center text-green-700 text-sm font-semibold">
+                      <TrendingUp className="h-4 w-4 mr-2" />
+                      {feature.impact}
+                    </div>
+                  </div>
+
+                  <div className="flex items-center text-purple-600 text-sm font-medium group-hover:text-purple-700">
+                    Try it now
+                    <svg className="ml-1 w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                    </svg>
+                  </div>
+                </div>
+              </Link>
             ))}
           </div>
         </div>

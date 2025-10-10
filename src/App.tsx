@@ -17,6 +17,9 @@ import Auth from "./pages/Auth";
 import SupplyChain from "./pages/SupplyChain";
 import PitchDeck from "./pages/PitchDeck";
 import Marketplace from "./pages/Marketplace";
+import CropDiagnostics from "./pages/CropDiagnostics";
+import WeatherInsights from "./pages/WeatherInsights";
+import Traceability from "./pages/Traceability";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient({
@@ -50,6 +53,9 @@ const App = () => {
               <Route path="/auth" element={<Auth />} />
               <Route path="/supply-chain" element={<SupplyChain />} />
               <Route path="/pitch" element={<PitchDeck />} />
+              <Route path="/crop-diagnostics" element={<CropDiagnostics />} />
+              <Route path="/weather-insights" element={<WeatherInsights />} />
+              <Route path="/traceability" element={<Traceability />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </BrowserRouter>

@@ -194,7 +194,8 @@ const FinancialServices = () => {
   ];
 
   const calculateLoanRepayment = () => {
-    const monthlyRate = 8.5 / 100 / 12;
+    const interestRate = loanProducts[0].interestRate; // Using first loan product's rate as default
+    const monthlyRate = interestRate / 100 / 12;
     const monthlyPayment = (loanAmount * monthlyRate * Math.pow(1 + monthlyRate, loanTerm)) / 
                           (Math.pow(1 + monthlyRate, loanTerm) - 1);
     const totalPayment = monthlyPayment * loanTerm;
@@ -203,12 +204,17 @@ const FinancialServices = () => {
   };
 
   const calculateSavingsProjection = () => {
-    const monthlyRate = 6.5 / 100 / 12;
+    const interestRate = 6.5; // Savings rate from savingsProducts
+    const monthlyRate = interestRate / 100 / 12;
     const futureValue = savingsAmount * ((Math.pow(1 + monthlyRate, savingsPeriod) - 1) / monthlyRate) * (1 + monthlyRate);
     const totalDeposits = savingsAmount * savingsPeriod;
     const totalInterest = futureValue - totalDeposits;
     return { futureValue, totalDeposits, totalInterest };
   };
+
+  // Memoize calculator results to avoid redundant calculations
+  const loanRepayment = calculateLoanRepayment();
+  const savingsProjection = calculateSavingsProjection();
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 via-blue-50 to-purple-50 relative overflow-hidden">
@@ -358,19 +364,19 @@ const FinancialServices = () => {
                       <div className="flex justify-between items-center">
                         <span className="text-gray-600">Monthly Payment:</span>
                         <span className="text-xl font-bold text-green-600">
-                          KSh {calculateLoanRepayment().monthlyPayment.toLocaleString('en-US', {maximumFractionDigits: 0})}
+                          KSh {loanRepayment.monthlyPayment.toLocaleString('en-US', {maximumFractionDigits: 0})}
                         </span>
                       </div>
                       <div className="flex justify-between items-center">
                         <span className="text-gray-600">Total Payment:</span>
                         <span className="font-semibold text-gray-900">
-                          KSh {calculateLoanRepayment().totalPayment.toLocaleString('en-US', {maximumFractionDigits: 0})}
+                          KSh {loanRepayment.totalPayment.toLocaleString('en-US', {maximumFractionDigits: 0})}
                         </span>
                       </div>
                       <div className="flex justify-between items-center">
                         <span className="text-gray-600">Total Interest:</span>
                         <span className="font-semibold text-gray-900">
-                          KSh {calculateLoanRepayment().totalInterest.toLocaleString('en-US', {maximumFractionDigits: 0})}
+                          KSh {loanRepayment.totalInterest.toLocaleString('en-US', {maximumFractionDigits: 0})}
                         </span>
                       </div>
                     </div>
@@ -475,19 +481,19 @@ const FinancialServices = () => {
                       <div className="flex justify-between items-center">
                         <span className="text-gray-600">Future Value:</span>
                         <span className="text-xl font-bold text-blue-600">
-                          KSh {calculateSavingsProjection().futureValue.toLocaleString('en-US', {maximumFractionDigits: 0})}
+                          KSh {savingsProjection.futureValue.toLocaleString('en-US', {maximumFractionDigits: 0})}
                         </span>
                       </div>
                       <div className="flex justify-between items-center">
                         <span className="text-gray-600">Total Deposits:</span>
                         <span className="font-semibold text-gray-900">
-                          KSh {calculateSavingsProjection().totalDeposits.toLocaleString('en-US', {maximumFractionDigits: 0})}
+                          KSh {savingsProjection.totalDeposits.toLocaleString('en-US', {maximumFractionDigits: 0})}
                         </span>
                       </div>
                       <div className="flex justify-between items-center">
                         <span className="text-gray-600">Interest Earned:</span>
                         <span className="font-semibold text-green-600">
-                          KSh {calculateSavingsProjection().totalInterest.toLocaleString('en-US', {maximumFractionDigits: 0})}
+                          KSh {savingsProjection.totalInterest.toLocaleString('en-US', {maximumFractionDigits: 0})}
                         </span>
                       </div>
                     </div>
@@ -586,7 +592,7 @@ const FinancialServices = () => {
 
                     <MpesaServicePayment
                       serviceName={`${insurance.name} Premium`}
-                      amount={2000}
+                      amount={insurance.name === 'Crop Insurance' ? 2000 : 2000}
                       description={`Premium payment for ${insurance.name}`}
                       onSuccess={handleInsurancePayment(insurance.name)}
                       buttonText="Pay Premium via M-Pesa"

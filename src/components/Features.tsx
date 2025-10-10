@@ -80,7 +80,8 @@ const Features = () => {
       icon: Sparkles,
       badge: 'NEW',
       impact: '30-40% reduction in crop loss',
-      color: 'from-purple-500 to-pink-500'
+      color: 'from-purple-500 to-pink-500',
+      link: '/crop-diagnostics'
     },
     {
       name: 'Smart Weather Advisor',
@@ -88,7 +89,8 @@ const Features = () => {
       icon: Cloud,
       badge: 'NEW',
       impact: '20-25% yield increase',
-      color: 'from-blue-500 to-cyan-500'
+      color: 'from-blue-500 to-cyan-500',
+      link: '/weather-insights'
     },
     {
       name: 'Blockchain Traceability',
@@ -96,7 +98,8 @@ const Features = () => {
       icon: QrCode,
       badge: 'NEW',
       impact: '40-50% price premium',
-      color: 'from-green-500 to-emerald-500'
+      color: 'from-green-500 to-emerald-500',
+      link: '/traceability'
     }
   ];
 
@@ -154,7 +157,7 @@ const Features = () => {
           </div>
           <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
             {competitiveFeatures.map((feature) => (
-              <div key={feature.name} className="group relative">
+              <Link key={feature.name} to={feature.link} className="group relative">
                 <div className="bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 p-8 h-full border-2 border-transparent hover:border-purple-300 transform hover:-translate-y-2">
                   {/* NEW Badge */}
                   <div className="absolute -top-3 -right-3">
@@ -177,14 +180,21 @@ const Features = () => {
                     {feature.description}
                   </p>
                   
-                  <div className="bg-gradient-to-r from-green-50 to-emerald-50 p-3 rounded-lg border border-green-200">
+                  <div className="bg-gradient-to-r from-green-50 to-emerald-50 p-3 rounded-lg border border-green-200 mb-4">
                     <div className="flex items-center text-green-700 text-sm font-semibold">
                       <TrendingUp className="h-4 w-4 mr-2" />
                       {feature.impact}
                     </div>
                   </div>
+
+                  <div className="flex items-center text-purple-600 text-sm font-medium group-hover:text-purple-700">
+                    Try it now
+                    <svg className="ml-1 w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                    </svg>
+                  </div>
                 </div>
-              </div>
+              </Link>
             ))}
           </div>
         </div>
